@@ -7,10 +7,32 @@
 using namespace web;
 using namespace web::websockets::client;
 
-struct ChatMessage {
-	ChatMessage(const std::string& sender, const std::string & message) : m_Sender(sender), m_Message(message) {}
+std::regex messageRegex(R"((?:@([^\s]*)\s)?:([a-zA-Z0-9_]{4,25})!([a-zA-Z0-9_]{4,25})@([a-zA-Z0-9_]{4,25})\.tmi\.twitch\.tv PRIVMSG #([a-zA-Z0-9_]{4,25}) :(.*)\r\n)");
 
-	const std::string m_Sender, m_Message;
+class SenderInfo {
+  public:
+	SenderInfo(const std::string& nickname, const std::string& tags) : m_Nickname(nickname), m_Tags(parseTags(tags)) {}
+
+	const std::string& getTag(const std::string& tag) const {
+		auto it = m_Tags.find(tag);
+		return it->second;
+	}
+	const std::string& getNickname() const {
+		return m_Nickname;
+	}
+  private:
+	std::map<std::string, std::string> parseTags(const std::string& tags) {
+		return std::map<std::string, std::string>();
+	}
+	const std::string m_Nickname;
+	const std::map<std::string, std::string> m_Tags;
+};
+
+struct ChatMessage {
+	ChatMessage(const SenderInfo& sender, const std::string & message) : m_Sender(sender), m_Message(message) {}
+
+	const SenderInfo m_Sender;
+	const std::string m_Message;
 };
 
 class TwitchBot {
@@ -64,19 +86,22 @@ class TwitchBot {
 		if (!tmp.first)
 			return std::make_pair(false, nullptr);
 		if (tmp.second == "PING :tmi.twitch.tv\r\n") {
-			std::cout<<"PING!"<<std::endl;
+			std::cout << "PING!" << std::endl;
 			sendSimpleMessage("PONG :tmi.twitch.tv");
 			return readMessage(timeout);
 		}
-		std::regex messageRegex(R"(:([a-zA-Z0-9_]{4,25})!([a-zA-Z0-9_]{4,25})@([a-zA-Z0-9_]{4,25})\.tmi\.twitch\.tv PRIVMSG #([a-zA-Z0-9_]{4,25}) :(.*)\r\n)");
+
 		std::smatch match;
-		if (!std::regex_match(tmp.second, match, messageRegex) || match[1] != match[2] || match[1] != match[3]) {
+		if (!std::regex_match(tmp.second, match, messageRegex) || match[2] != match[3] || match[2] != match[4]) {
 			std::cerr<<"Malformated message?"<<std::endl<<tmp.second<<std::endl;
 			return std::make_pair(false, nullptr);
 		}
-		std::string username = match[1], message = match[5];
-		if (match[4] != m_Channel) return readMessage(timeout);
-		return std::make_pair(true, std::move(std::make_unique<ChatMessage>(username, message)));
+		std::string username = match[2], message = match[6], tags = match[1];
+		if (match[5] != m_Channel) {
+			std::cout<< "WTF "<<tmp.second<<std::endl;
+			return readMessage(timeout);
+		}
+		return std::make_pair(true, std::move(std::make_unique<ChatMessage>(SenderInfo(username, tags), message)));
 	}
 
 	bool partChannel() {
@@ -120,8 +145,8 @@ class TwitchBot {
 				sendMessage("Hello " + sender);
 			});
 	}
-	bool capReq(std::string stuff) {// TODO refactor
-		sendSimpleMessage("CAP REQ :"+stuff).wait();
+	bool capReq(const std::string& stuff) {// TODO refactor
+		sendSimpleMessage("CAP REQ :" + stuff).wait();
 		auto tmp = readSimpleMessage();
 		if (!tmp.first)
 			return false;
@@ -173,7 +198,8 @@ int main() {
 		std::cerr << "Failed to load login info" << std::endl;
 		return 1;
 	}
-	std::string channel = "fattypillow";
+	//std::string channel = "fattypillow";
+	std::string channel = "ivosu";
 	if (!bot.connect()) {
 		std::cerr << "Connection failed" << std::endl;
 		return 1;
@@ -191,7 +217,7 @@ int main() {
 	}
 	auto tmp = bot.readMessage();
 	while(tmp.first){
-		const std::string& sender = tmp.second->m_Sender;
+		const std::string& sender = tmp.second->m_Sender.getNickname();
 		const std::string& message = tmp.second->m_Message;
 		std::cout<<sender<<":"<<message<<std::endl;
 		/*if (message.size() > 1 && message[0] == '!') {
