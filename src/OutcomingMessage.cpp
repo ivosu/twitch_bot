@@ -5,11 +5,11 @@
 #include "OutcomingMessage.h"
 
 using std::string;
-using std::variant;
+using std::optional;
 using std::vector;
 using std::map;
 
-OutcomingMessage::OutcomingMessage(const map<string, variant<string, void>>& tags, const string& prefix,
+OutcomingMessage::OutcomingMessage(const map<string, optional<string>>& tags, const string& prefix,
 								   const string& command, const vector<string>& params) {
 	m_Tags = tags;
 	m_Prefix = prefix;

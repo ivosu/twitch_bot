@@ -9,9 +9,8 @@
 
 class OutcomingMessage : public Message {
   public:
-	OutcomingMessage(const std::map<std::string, std::variant<std::string, void>>& tags, const std::string& prefix,
+	OutcomingMessage(const std::map<std::string, std::optional<std::string>>& tags, const std::string& prefix,
 					 const std::string& command, const std::vector<std::string>& params);
 };
-
 
 #endif //TWITCH_IRC_OUTCOMINGMESSAGE_H

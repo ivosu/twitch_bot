@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <variant>
+#include <optional>
 
 class Message {
   public:
@@ -19,7 +19,7 @@ class Message {
 
 	const std::vector<std::string>& getParams() const;
 
-	const std::map<std::string, std::string>& getTags() const;
+	const std::map<std::string, std::optional<std::string>>& getTags() const;
 
   protected:
 	Message() = default;
@@ -27,7 +27,7 @@ class Message {
 	std::string m_Prefix;
 	std::string m_Command;
 	std::vector<std::string> m_Params;
-	std::map<std::string, std::variant<std::string, void>> m_Tags;
+	std::map<std::string, std::optional<std::string>> m_Tags;
 };
 
 

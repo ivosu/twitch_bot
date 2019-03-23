@@ -9,9 +9,12 @@
 using std::string;
 using std::vector;
 using std::map;
+using std::pair;
 using std::regex;
 using std::smatch;
-using std::variant;
+using std::optional;
+using std::make_pair;
+using std::nullopt;
 
 string getUnescapedTagValue(const string& escapedTagValue) {
 	string unescapedTagValue;
@@ -50,12 +53,36 @@ string getUnescapedTagValue(const string& escapedTagValue) {
 	return unescapedTagValue;
 }
 
-map<string, variant<string, void>> parseTags(const string& tags) {
-	map<string, variant<string, void>> parsedTags;
-	for (auto it = tags.begin(); it < tags.end(); it++) {
-		string key;
-		// TODO FINISH
+string parseTagValue(string::const_iterator& it, const string::iterator& end) {
+	string tagValue;
+	while(it != end && *it != ';' && *it != ' ' && *it != '\r' && *it != '\n' && *it != '\0') {
+		//if
 	}
+}
+
+string parseKey(string::const_iterator& it, const string::iterator& end) {
+	string key;
+	while(it != end && (isalnum(*it) || *it == '-' || *it == '/' || *it == '+')) // TODO make precisely as in rfc1459
+		key.push_back(*(it++));
+	assert(!key.empty());
+	return key;
+}
+
+pair<string, optional<string>> parseTag (string::const_iterator& it, const string::iterator& end) {
+	string key = parseKey(it, end);
+	if (it != end && *it == '=')
+		return make_pair(key, parseTagValue(it, end));
+	else
+		return make_pair(key, nullopt);
+}
+
+map<string, optional<string>> parseTags(string::const_iterator& it, const string::iterator& end) {
+	map<string, optional<string>> parsedTags;
+	if (it == rawMessage.end() || *it != '@') {
+		return parsedTags;
+	}
+	it++;
+	par
 	return parsedTags;
 }
 
@@ -97,5 +124,3 @@ IncomingMessage::IncomingMessage(const string& rawMessage) {
 	m_Command = match[3];
 	m_Params = parseParams(match[4]);
 }
-
-
