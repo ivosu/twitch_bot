@@ -11,23 +11,33 @@
 #include <vector>
 #include <optional>
 
+using std::string;
+using std::vector;
+using std::map;
+using std::optional;
+
 class Message {
   public:
-	const std::string& getPrefix() const;
+	Message(const string& rawMessage);
 
-	const std::string& getCommand() const;
+	Message(const map<string, optional<string>>& tags, const string& prefix, const string& command,
+			const vector<string>& params) : m_Tags(tags), m_Prefix(prefix), m_Command(command), m_Params(params){};
 
-	const std::vector<std::string>& getParams() const;
+	const string& getPrefix() const;
 
-	const std::map<std::string, std::optional<std::string>>& getTags() const;
+	const string& getCommand() const;
 
-  protected:
-	Message() = default;
+	const vector<string>& getParams() const;
 
-	std::string m_Prefix;
-	std::string m_Command;
-	std::vector<std::string> m_Params;
-	std::map<std::string, std::optional<std::string>> m_Tags;
+	const map<string, optional<string>>& getTags() const;
+
+	string toIRCMessage() const;
+
+  private:
+	map<string, optional<string>> m_Tags;
+	string m_Prefix;
+	string m_Command;
+	vector<string> m_Params;
 };
 
 
