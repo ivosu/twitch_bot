@@ -5,8 +5,10 @@ find_library(CPPREST cpprest)
 find_library(BOOST boost_system)
 find_library(CONFIG config++)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
-add_executable(twitch_irc main.cpp)
+file(GLOB src "src/*.cpp")
+
+add_executable(twitch_irc main.cpp ${src})
 
 target_link_libraries(twitch_irc ${CPPREST} ${BOOST} ${CONFIG})
