@@ -1,10 +1,38 @@
 #include "Message.h"
+#include <algorithm>
 #include <assert.h>
 
 
 using std::pair;
 using std::make_pair;
 using std::nullopt;
+using std::replace;
+
+string escapeTagValue(const string& tagValue) {
+	string escapedTagValue;
+	for (char c : tagValue) {
+		switch (c) {
+			case ' ':
+				escapedTagValue += "\\s";
+				break;
+			case '\r':
+				escapedTagValue += "\\r";
+				break;
+			case '\n':
+				escapedTagValue += "\\n";
+				break;
+			case '\\':
+				escapedTagValue += "\\\\";
+				break;
+			case ';':
+				escapedTagValue += "\\:";
+				break;
+			default:
+				escapedTagValue.push_back(c);
+		}
+	}
+	return escapedTagValue;
+}
 
 static string parseKey(string::const_iterator& it, const string::const_iterator& end) {
 	string key;
@@ -160,4 +188,40 @@ Message::Message(const string& rawMessage) {
 	m_Prefix = parsePrefix(it, end);
 	m_Command = parseCommand(it, end);
 	m_Params = parseParams(it, end);
+	assert(it != end && *it == '\r');
+	*it++;
+	assert(it != end && *it == '\n');
+	*it++;
+	assert(it == end);
+}
+
+string Message::toIRCMessage() const {
+	string rawMessage;
+	if (!m_Tags.empty()) {
+		auto it = m_Tags.begin();
+		rawMessage = '@'+it->first;
+		if (it->second.has_value())
+			rawMessage += '=' + escapeTagValue(it->second.value());
+		it++;
+		for (; it != m_Tags.end(); it++) {
+			rawMessage += ';' + it->first;
+			if (it->second.has_value())
+				rawMessage += '=' + escapeTagValue(it->second.value());
+		}
+		rawMessage+=' ';
+	}
+	if (!m_Prefix.empty()) {
+		rawMessage += ":" + m_Prefix + ' ';
+	}
+	rawMessage += m_Command;
+	for (auto it = m_Params.begin(); it != m_Params.end(); it++) {
+		rawMessage+=' ';
+		// Todo check right format
+		if (next(it) == m_Params.end()) {
+			rawMessage+=":";
+		}
+		rawMessage+=*it;
+	}
+	rawMessage += "\r\n";
+	return rawMessage;
 }

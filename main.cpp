@@ -6,7 +6,10 @@
 #include "src/Message.h"
 
 int main() {
-	Message a("@badges=subscriber/12,sub-gifter/1;color=;display-name=staxcz;emotes=3:25-26;flags=;id=9bbbf1e1-31e4-4243-a882-dd69b83e6bf4;mod=0;room-id=76073513;subscriber=1;tmi-sent-ts=1553120470096;turbo=0;user-id=107979616;user-type= :staxcz!staxcz@staxcz.tmi.twitch.tv PRIVMSG #fattypillow :na ptaka sou top zaclony :D");
+	string exampleMessage = "@badges=subscriber/12,sub-gifter/1;color=;display-name=staxcz;emotes=3:25-26;flags=;id=9bbbf1e1-31e4-4243-a882-dd69b83e6bf4;mod=0;room-id=76073513;subscriber=1;tmi-sent-ts=1553120470096;turbo=0;user-id=107979616;user-type= :staxcz!staxcz@staxcz.tmi.twitch.tv PRIVMSG #fattypillow :na ptaka sou top zaclony :D\r\n";
+	Message a(exampleMessage);
+	std::cout<<exampleMessage<<std::endl<<a.toIRCMessage()<<std::endl;
+	assert(a.toIRCMessage() == exampleMessage);
 	return 0;
 	libconfig::Config conf;
 	try {
