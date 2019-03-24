@@ -136,19 +136,16 @@ static string parseTrailingParam(string::const_iterator& it, const string::const
 
 static vector<string> parseParams(string::const_iterator& it, const string::const_iterator& end) {
 	vector<string> parsedParams;
-	assert(it != end);
-	if (*it != ' ')
-		return parsedParams;
-	it++;
-	while(it != end && *it != ':' && *it != '\r' && *it != '\n' && *it != '\0') {
-		parsedParams.push_back(parseMiddleParam(it, end));
-		assert(it != end && *it == ' ');
+	while(it != end && *it == ' ') {
 		it++;
+		if (*it != ':')
+			parsedParams.push_back(parseMiddleParam(it, end));
+		else {
+			it++;
+			parsedParams.push_back(parseTrailingParam(it, end));
+			break;
+		}
 	}
-	assert(it != end);
-	assert(*it == ':');
-	it++;
-	parsedParams.push_back(parseTrailingParam(it, end));
 	return parsedParams;
 }
 
@@ -216,8 +213,8 @@ string Message::toIRCMessage() const {
 	rawMessage += m_Command;
 	for (auto it = m_Params.begin(); it != m_Params.end(); it++) {
 		rawMessage+=' ';
-		// Todo check right format
-		if (next(it) == m_Params.end()) {
+		if (it->find(' ') != string::npos){
+			assert(next(it) == m_Params.end());
 			rawMessage+=":";
 		}
 		rawMessage+=*it;

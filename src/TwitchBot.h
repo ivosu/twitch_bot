@@ -5,14 +5,15 @@
 #ifndef TWITCH_IRC_TWITCHBOT_H
 #define TWITCH_IRC_TWITCHBOT_H
 
-#include "Message.h"
+#include "irc/Message.h"
+#include "irc/IRCClient.h"
 #include <string>
-#include <pplx/pplxtasks.h>
-#include <cpprest/ws_client.h>
+
 
 class TwitchBot {
   public:
-	bool connect();
+
+	TwitchBot();
 
 	bool login(const std::string& nickname, const std::string& auth, ...);
 
@@ -20,7 +21,7 @@ class TwitchBot {
 
 	pplx::task<void> sendMessage(const std::string& message);
 
-	std::pair<bool, std::unique_ptr<Message>> readMessage(unsigned int timeout = 0);
+	Message readMessage(unsigned int timeout = 0);
 
 	bool partChannel();
 
@@ -31,12 +32,9 @@ class TwitchBot {
 	bool capReq(const std::string& stuff);
 
   private:
-	std::pair<bool, std::string> readSimpleMessage();
-
-	pplx::task<void> sendSimpleMessage(const std::string& message);
-
-	web::websockets::client::websocket_client m_Client;
+	IRCClient m_ircClient;
 	std::string m_Nickname;
+	bool m_Connected = false;
 	bool m_LoggedIn = false;
 	bool m_JoinedChannel = false;
 	std::string m_Channel;
