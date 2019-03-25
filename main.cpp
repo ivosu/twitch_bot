@@ -31,7 +31,7 @@ int main() {
 		return 1;
 	}
 
-	bot.cap_req("twitch.tv/commands twitch.tv/tags");
+	bot.cap_req({"twitch.tv/commands", "twitch.tv/tags"});
 
 	std::cout<<"Chat connected"<<std::endl;
 	while (true) {
@@ -58,12 +58,52 @@ int main() {
 			std::cout << tmp.to_irc_message();
 			if (tmp.command() == "USERNOTICE") {
 				auto tags = tmp.tags();
-				if (tags.at("msg-id").has_value()) {
-					if (tags.at("msg-id").value() == "sub") {
-						std::string user;
-						if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
-							user = tags.at("display-name").value();
-						} else user = tags.at("login").value();
+				auto msg_id_it = tags.find("msg-id");
+				if (msg_id_it == tags.cend() || !msg_id_it->second.has_value())
+					continue;
+				const std::string& msg_id = msg_id_it->second.value();
+				if (msg_id == "sub" || msg_id == "resub") {
+					std::string user;
+					auto display_name_it = tags.find("display-name");
+					if (display_name_it != tags.cend() && display_name_it->second.has_value() && !display_name_it->second.value().empty()) {
+						user = display_name_it->second.value();
+					} else {
+						auto login_it = tags.find("login");
+						if (login_it != tags.cend() && login_it->second.has_value() && !login_it->second.value().empty()) {
+							user = login_it->second.value();
+						} else {
+							// DAFAK?
+							continue;
+						}
+					}
+					bot.send_message("fattySub fattySub fattySub Vítej " + std::string(msg_id == "resub" ? "zpátky " : "") + user +
+									 " do naší tučné rodiny fattySub fattySub fattySub", channel);
+				}
+				/*
+				try {
+					if (tags.at("msg-id").has_value()) {
+						if (tags.at("msg-id").value() == "sub") {
+							std::string user;
+							try {
+								if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
+									user = tags.at("display-name").value();
+								} else {
+									try {
+										user = tags.at("login").value();
+									} catch (const std::out_of_range& e) {
+										// No nick????
+									}
+								}
+							} catch (const std::out_of_range& e) {
+
+							}
+						}
+					}
+				} catch (const std::out_of_range& e) {
+
+				}
+
+						} else
 						bot.send_message(
 						  "fattySub fattySub fattySub Vítej " + user + " do tučné rodiny fattySub fattySub fattySub",
 						  channel);
@@ -72,10 +112,9 @@ int main() {
 						if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
 							user = tags.at("display-name").value();
 						} else user = tags.at("login").value();
-						bot.send_message("fattySub fattySub fattySub Vítej zpátky " + user +
-										 " do tučné rodiny fattySub fattySub fattySub", channel);
+
 					}
-				}
+				}*/
 			}
 		}
 	}

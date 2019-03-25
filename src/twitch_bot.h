@@ -28,7 +28,7 @@ class twitch_bot {
 
 	void on_command(const irc::message& command);
 
-	void cap_req(const std::string& stuff);
+	void cap_req(const std::vector<std::string>& capabilities);
 
   private:
 	irc::irc_client m_irc_client;

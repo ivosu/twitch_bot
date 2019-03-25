@@ -254,6 +254,19 @@ message message::pong_message(const string& daemon1, const string& daemon2) {
 	return message({}, nullopt, "PONG", {daemon1, daemon2});
 }
 
+message message::capability_request_message(const vector<string>& capabilities) {
+	vector<string> params({"REQ"});
+	assert(!capabilities.empty());
+	auto c_it = capabilities.cbegin();
+	string capabilities_str = *c_it;
+
+	for (c_it++; c_it != capabilities.cend(); c_it++) {
+		capabilities_str += ' ' + *c_it;
+	}
+	params.push_back(capabilities_str);
+	return message({}, nullopt, "CAP", params);
+}
+
 string message::to_irc_message() const {
 	string rawMessage;
 	if (!m_tags.empty()) {

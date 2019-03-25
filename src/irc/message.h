@@ -57,6 +57,8 @@ namespace irc {
 
 		static message pong_message(const std::string& daemon1, const std::string& deamon2);
 
+		static message capability_request_message(const std::vector<std::string>& capabilities);
+
 		const std::optional<prefix::prefix>& prefix() const { return m_prefix; }
 
 		const std::string& command() const { return m_command; }

@@ -6,6 +6,7 @@
 
 using std::string;
 using std::vector;
+using std::back_inserter;
 using std::nullopt;
 using irc::message;
 
@@ -107,6 +108,7 @@ void twitch_bot::on_command(const message& command) {
 
 }
 
-void twitch_bot::cap_req(const std::string& stuff) {// TODO refactor
-	m_irc_client.send_message(message({}, nullopt, "CAP", {"REQ", stuff})).wait();
+void twitch_bot::cap_req(const vector<string>& capabilities) {
+
+	m_irc_client.send_message(message::capability_request_message(capabilities)).wait();
 }
