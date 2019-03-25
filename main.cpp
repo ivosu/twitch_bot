@@ -1,20 +1,8 @@
 #include <iostream>
-#include <regex>
 #include <libconfig.h++>
-#include <cpprest/ws_client.h>
-#include "src/TwitchBot.h"
-#include "src/irc/Message.h"
+#include "src/twitch_bot.h"
 
 int main() {
-	/*string exampleMessage = "@badges=subscriber/12,sub-gifter/1;color=;display-name=staxcz;emotes=3:25-26;flags=;id=9bbbf1e1-31e4-4243-a882-dd69b83e6bf4;mod=0;room-id=76073513;subscriber=1;tmi-sent-ts=1553120470096;turbo=0;user-id=107979616;user-type= :staxcz!staxcz@staxcz.tmi.twitch.tv PRIVMSG #fattypillow :na ptaka sou top zaclony :D\r\n";
-	Message a(exampleMessage);
-	std::cout<<exampleMessage<<std::endl<<a.toIRCMessage()<<std::endl;
-	assert(a.toIRCMessage() == exampleMessage);
-	string exampleMessage2 = "JOIN #blabla\r\n";
-	Message b(exampleMessage2);
-	std::cout<<exampleMessage2<<std::endl<<b.toIRCMessage()<<std::endl;
-	assert(b.toIRCMessage() == exampleMessage2);
-	return 0;*/
 	libconfig::Config conf;
 	try {
 		conf.readFile("config");
@@ -23,7 +11,7 @@ int main() {
 	} catch (libconfig::ParseException& e) {
 		std::cerr << e.getError() << " on line " << e.getLine() << std::endl;
 	}
-	TwitchBot bot;
+	twitch_bot bot;
 	libconfig::Setting& login = conf.lookup("login");
 	std::string username;
 	std::string auth;
@@ -32,22 +20,39 @@ int main() {
 		return 1;
 	}
 	//std::string channel = "fattypillow";
-	std::string channel = "twitchpresents";
+	std::string channel = "ivosu";
 
 	if (!bot.login(username, auth)) {
 		std::cerr << "Failed to login" << std::endl;
 		return 1;
 	}
-	if (!bot.joinChannel(channel)) {
+	if (!bot.join_channel(channel)) {
 		std::cerr << "Failed to join channel " << channel << std::endl;
 		return 1;
 	}
-	if (!bot.capReq("twitch.tv/commands twitch.tv/tags")) {
+	if (!bot.cap_req("twitch.tv/commands twitch.tv/tags")) {
 		std::cerr << "Unable to request command and tags" << std::endl;
 	}
 	while (true) {
-		Message tmp = bot.readMessage();
-		std::cout<<tmp.toIRCMessage()<<std::endl;
+		irc::message tmp = bot.read_message();
+		if (tmp.command() == "PRIVMSG") {
+			std::string sender;
+			auto tags = tmp.tags();
+			if (tags["display-name"].has_value()) {
+				sender = tags["display-name"].value();
+			}
+			else {
+				for (const auto& c : tmp.prefix()) {
+					if (c != '!')
+						sender.push_back(c);
+					else break;
+				}
+			}
+			std::string message = *tmp.params().rbegin();
+			std::cout<<sender<<" : "<<message<<std::endl;
+			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
+				break;
+		} else std::cout<< tmp.to_irc_message();
 	}
 	return 0;
 }

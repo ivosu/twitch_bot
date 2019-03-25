@@ -1,8 +1,11 @@
-#include "Message.h"
+#include "message.h"
 #include <algorithm>
 #include <assert.h>
 
-
+using std::string;
+using std::vector;
+using std::map;
+using std::optional;
 using std::pair;
 using std::make_pair;
 using std::nullopt;
@@ -162,29 +165,29 @@ string parsePrefix(string::const_iterator& it, const string::const_iterator& end
 	return prefix;
 }
 
-const string& Message::getPrefix() const {
-	return m_Prefix;
+const string& irc::message::prefix() const {
+	return m_prefix;
 }
 
-const string& Message::getCommand() const {
-	return m_Command;
+const string& irc::message::command() const {
+	return m_command;
 }
 
-const vector<string>& Message::getParams() const {
-	return m_Params;
+const vector<string>& irc::message::params() const {
+	return m_params;
 }
 
-const map<string, optional<string>>& Message::getTags() const {
-	return m_Tags;
+const map<string, optional<string>>& irc::message::tags() const {
+	return m_tags;
 }
 
-Message::Message(const string& rawMessage) {
+irc::message::message(const string& rawMessage) {
 	auto it = rawMessage.begin();
 	auto end = rawMessage.end();
-	m_Tags = parseTags(it, end);
-	m_Prefix = parsePrefix(it, end);
-	m_Command = parseCommand(it, end);
-	m_Params = parseParams(it, end);
+	m_tags = parseTags(it, end);
+	m_prefix = parsePrefix(it, end);
+	m_command = parseCommand(it, end);
+	m_params = parseParams(it, end);
 	assert(it != end && *it == '\r');
 	*it++;
 	assert(it != end && *it == '\n');
@@ -192,29 +195,33 @@ Message::Message(const string& rawMessage) {
 	assert(it == end);
 }
 
-string Message::toIRCMessage() const {
+irc::message irc::message::private_message(const std::string& message_text, const std::string& channel) {
+	return irc::message({}, "", "PRIVMSG", {"#" + channel, message_text});
+}
+
+string irc::message::to_irc_message() const {
 	string rawMessage;
-	if (!m_Tags.empty()) {
-		auto it = m_Tags.begin();
+	if (!m_tags.empty()) {
+		auto it = m_tags.begin();
 		rawMessage = '@'+it->first;
 		if (it->second.has_value())
 			rawMessage += '=' + escapeTagValue(it->second.value());
 		it++;
-		for (; it != m_Tags.end(); it++) {
+		for (; it != m_tags.end(); it++) {
 			rawMessage += ';' + it->first;
 			if (it->second.has_value())
 				rawMessage += '=' + escapeTagValue(it->second.value());
 		}
 		rawMessage+=' ';
 	}
-	if (!m_Prefix.empty()) {
-		rawMessage += ":" + m_Prefix + ' ';
+	if (!m_prefix.empty()) {
+		rawMessage += ":" + m_prefix + ' ';
 	}
-	rawMessage += m_Command;
-	for (auto it = m_Params.begin(); it != m_Params.end(); it++) {
+	rawMessage += m_command;
+	for (auto it = m_params.begin(); it != m_params.end(); it++) {
 		rawMessage+=' ';
 		if (it->find(' ') != string::npos){
-			assert(next(it) == m_Params.end());
+			assert(next(it) == m_params.end());
 			rawMessage+=":";
 		}
 		rawMessage+=*it;
