@@ -27,7 +27,7 @@ irc::message irc::irc_client::read_message(size_t timeout) {
 		}).then([&in](std::string body) { in = body; }).wait() == pplx::task_status::completed) {
 			istringstream is(in);
 			string tmp;
-			while(getline(is, tmp)) {
+			while (getline(is, tmp)) {
 				tmp += "\n"; // Put back the newline so the parsing is proper
 				m_queued_messaged.emplace(tmp);
 			}

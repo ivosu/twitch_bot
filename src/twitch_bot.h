@@ -27,7 +27,7 @@ class twitch_bot {
 
 	bool join_channel(const std::string& channel);
 
-	void on_command(const std::string& sender, const std::string& command, const std::string& restOfCommand);
+	void on_command(const irc::message& command);
 
 	bool cap_req(const std::string& stuff);
 

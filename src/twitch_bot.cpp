@@ -15,35 +15,35 @@ bool twitch_bot::login(const std::string& nickname, const std::string& auth, ...
 	message passMessage({}, "", "PASS", {auth});
 	message nickMessage({}, "", "NICK", {nickname});
 	if (m_irc_client.send_message(passMessage).wait() != pplx::task_status::completed ||
-			m_irc_client.send_message(nickMessage).wait() != pplx::task_status::completed)
+		m_irc_client.send_message(nickMessage).wait() != pplx::task_status::completed)
 		return false;
 	message retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "001" || retMessage.prefix() != "tmi.twitch.tv" ||
-			retMessage.params() != vector<string>{nickname, "Welcome, GLHF!"})
+		retMessage.params() != vector<string>{nickname, "Welcome, GLHF!"})
 		return false;
 	retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "002" || retMessage.prefix() != "tmi.twitch.tv" ||
-			retMessage.params() != vector<string>{nickname, "Your host is tmi.twitch.tv"})
+		retMessage.params() != vector<string>{nickname, "Your host is tmi.twitch.tv"})
 		return false;
 	retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "003" || retMessage.prefix() != "tmi.twitch.tv" ||
-			retMessage.params() != vector<string>{nickname, "This server is rather new"})
+		retMessage.params() != vector<string>{nickname, "This server is rather new"})
 		return false;
 	retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "004" || retMessage.prefix() != "tmi.twitch.tv" ||
-			retMessage.params() != vector<string>{nickname, "-"})
+		retMessage.params() != vector<string>{nickname, "-"})
 		return false;
 	retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "375" || retMessage.prefix() != "tmi.twitch.tv" ||
-			retMessage.params() != vector<string>{nickname, "-"})
+		retMessage.params() != vector<string>{nickname, "-"})
 		return false;
 	retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "372" || retMessage.prefix() != "tmi.twitch.tv" ||
-			retMessage.params() != vector<string>{nickname, "You are in a maze of twisty passages, all alike."})
+		retMessage.params() != vector<string>{nickname, "You are in a maze of twisty passages, all alike."})
 		return false;
 	retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "376" || retMessage.prefix() != "tmi.twitch.tv" ||
-			retMessage.params() != vector<string>{nickname, ">"})
+		retMessage.params() != vector<string>{nickname, ">"})
 		return false;
 	m_logged_in = true;
 	m_nickname = nickname;
@@ -66,7 +66,7 @@ message twitch_bot::read_message(unsigned int timeout) {
 	assert(m_joined_channel);
 	auto tmp_message = m_irc_client.read_message(timeout);
 	if (tmp_message.command() == "PING" && tmp_message.params() == vector<string>{"tmi.twitch.tv"}) {
-		std::cout<<"PING"<<std::endl;
+		std::cout << "PING" << std::endl;
 		m_irc_client.send_message(message({}, "", "PONG", {"tmi.twitch.tv"}));
 		return read_message(timeout); // TODO should subtract time elapsed so far
 	}
@@ -93,30 +93,27 @@ bool twitch_bot::join_channel(const std::string& channel) {
 
 	message responseMessage = m_irc_client.read_message();
 	if (responseMessage.command() != "JOIN" || responseMessage.params() != vector<string>{"#" + channel} ||
-			responseMessage.prefix() != m_nickname + "!" + m_nickname + "@" + m_nickname + ".tmi.twitch.tv")
+		responseMessage.prefix() != m_nickname + "!" + m_nickname + "@" + m_nickname + ".tmi.twitch.tv")
 		return false;
 
 	responseMessage = m_irc_client.read_message();
 	if (responseMessage.command() != "353" ||
-			responseMessage.params() != vector<string>{m_nickname, "=", "#" + channel, m_nickname} ||
-			responseMessage.prefix() != m_nickname + ".tmi.twitch.tv")
+		responseMessage.params() != vector<string>{m_nickname, "=", "#" + channel, m_nickname} ||
+		responseMessage.prefix() != m_nickname + ".tmi.twitch.tv")
 		return false;
 
 	responseMessage = m_irc_client.read_message();
 	if (responseMessage.command() != "366" ||
-			responseMessage.params() != vector<string>{m_nickname, "#" + channel, "End of /NAMES list"} ||
-			responseMessage.prefix() != m_nickname + ".tmi.twitch.tv")
+		responseMessage.params() != vector<string>{m_nickname, "#" + channel, "End of /NAMES list"} ||
+		responseMessage.prefix() != m_nickname + ".tmi.twitch.tv")
 		return false;
 	m_joined_channel = true;
 	m_channel = channel;
 	return true;
 }
 
-void twitch_bot::on_command(const std::string& sender, const std::string& command, const std::string& restOfCommand) {
-	if (command == "hello")
-		pplx::task<void>([this, sender] {
-			send_message("Hello " + sender);
-		});
+void twitch_bot::on_command(const message& command) {
+
 }
 
 bool twitch_bot::cap_req(const std::string& stuff) {// TODO refactor

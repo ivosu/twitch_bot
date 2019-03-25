@@ -40,8 +40,7 @@ int main() {
 			auto tags = tmp.tags();
 			if (tags["display-name"].has_value()) {
 				sender = tags["display-name"].value();
-			}
-			else {
+			} else {
 				for (const auto& c : tmp.prefix()) {
 					if (c != '!')
 						sender.push_back(c);
@@ -49,10 +48,10 @@ int main() {
 				}
 			}
 			std::string message = *tmp.params().rbegin();
-			std::cout<<sender<<" : "<<message<<std::endl;
+			std::cout << sender << " : " << message << std::endl;
 			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
 				break;
-		} else std::cout<< tmp.to_irc_message();
+		} else std::cout << tmp.to_irc_message();
 	}
 	return 0;
 }

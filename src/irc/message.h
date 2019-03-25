@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include <optional>
+
 namespace irc {
 	class message {
 	  public:
@@ -22,13 +23,13 @@ namespace irc {
 
 		static message private_message(const std::string& message_text, const std::string& channel);
 
-		const std::string& prefix() const;
+		const std::string& prefix() const { return m_prefix; }
 
-		const std::string& command() const;
+		const std::string& command() const { return m_command; }
 
-		const std::vector<std::string>& params() const;
+		const std::vector<std::string>& params() const { return m_params; }
 
-		const std::map<std::string, std::optional<std::string>>& tags() const;
+		const std::map<std::string, std::optional<std::string>>& tags() const { return m_tags; }
 
 		std::string to_irc_message() const;
 
@@ -36,7 +37,7 @@ namespace irc {
 		std::map<std::string, std::optional<std::string>> m_tags;
 		std::string m_prefix;
 		std::string m_command;
-		std::vector <std::string> m_params;
+		std::vector<std::string> m_params;
 	};
 }
 
