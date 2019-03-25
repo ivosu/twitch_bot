@@ -8,6 +8,7 @@
 #include "irc/message.h"
 #include "irc/irc_client.h"
 #include <string>
+#include <set>
 
 
 class twitch_bot {
@@ -19,8 +20,6 @@ class twitch_bot {
 
 	pplx::task<void> send_message(const std::string& message, const std::string& channel);
 
-	pplx::task<void> send_message(const std::string& message);
-
 	irc::message read_message(unsigned int timeout = 0);
 
 	bool part_channel(const std::string& channel);
@@ -29,14 +28,13 @@ class twitch_bot {
 
 	void on_command(const irc::message& command);
 
-	bool cap_req(const std::string& stuff);
+	void cap_req(const std::string& stuff);
 
   private:
 	irc::irc_client m_irc_client;
 	std::string m_nickname;
 	bool m_logged_in = false;
-	bool m_joined_channel = false;
-	std::string m_channel;
+	std::set<std::string> m_joined_channels;
 };
 
 #endif //TWITCH_IRC_TWITCHBOT_H

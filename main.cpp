@@ -30,28 +30,48 @@ int main() {
 		std::cerr << "Failed to join channel " << channel << std::endl;
 		return 1;
 	}
-	if (!bot.cap_req("twitch.tv/commands twitch.tv/tags")) {
-		std::cerr << "Unable to request command and tags" << std::endl;
-	}
+
+	bot.cap_req("twitch.tv/commands twitch.tv/tags");
+
+	std::cout<<"Chat connected"<<std::endl;
 	while (true) {
 		irc::message tmp = bot.read_message();
 		if (tmp.command() == "PRIVMSG") {
 			std::string sender;
-			auto tags = tmp.tags();
-			if (tags["display-name"].has_value()) {
-				sender = tags["display-name"].value();
-			} else {
-				for (const auto& c : tmp.prefix()) {
-					if (c != '!')
-						sender.push_back(c);
-					else break;
+			try{
+				auto tags = tmp.tags();
+				if (tags.at("display-name").has_value()) {
+					sender = tags["display-name"].value();
+				} else {
+					assert(tmp.prefix().has_value());
+					sender = tmp.prefix().value().main();
 				}
+			} catch (const std::out_of_range& e) {
+				assert(tmp.prefix().has_value());
+				sender = tmp.prefix().value().main();
 			}
 			std::string message = *tmp.params().rbegin();
 			std::cout << sender << " : " << message << std::endl;
 			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
 				break;
-		} else std::cout << tmp.to_irc_message();
+		} /*else if (tmp.command() == "USERNOTICE") {
+			auto tags = tmp.tags();
+			if (tags.at("msg-id").has_value()) {
+				if (tags.at("msg-id").value() == "sub") {
+					std::string user;
+					if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
+						user = tags.at("display-name").value();
+					} else user = tags.at("login").value();
+					bot.send_message("fattySub fattySub fattySub Vítej " + user + " do tučné rodiny fattySub fattySub fattySub", channel);
+				} else if (tags.at("msg-id").value() == "resub") {
+					std::string user;
+					if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
+						user = tags.at("display-name").value();
+					} else user = tags.at("login").value();
+					bot.send_message("fattySub fattySub fattySub Vítej zpátky " + user + " do tučné rodiny fattySub fattySub fattySub", channel);
+				} else std::cout << tmp.to_irc_message();
+			}
+		}*/ else std::cout << tmp.to_irc_message();
 	}
 	return 0;
 }

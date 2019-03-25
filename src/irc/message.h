@@ -13,11 +13,32 @@
 #include <memory>
 
 namespace irc {
+	namespace prefix {
+		class prefix {
+		  public:
+			prefix(const std::string& main, const std::optional<std::string>& user,
+				   const std::optional<std::string>& host) : m_main(main), m_user(user), m_host(host) {}
+
+			const std::string& main() const { return m_main; }
+
+			const std::optional<std::string>& user() const { return m_user; }
+
+			const std::optional<std::string>& host() const { return m_host; }
+
+			std::string to_irc_prefix() const;
+
+		  private:
+			std::string m_main;
+			std::optional<std::string> m_user;
+			std::optional<std::string> m_host;
+		};
+	}
+
 	class message {
 	  public:
 		message(const std::string& rawMessage);
 
-		message(const std::map<std::string, std::optional<std::string>>& tags, const std::string& prefix,
+		message(const std::map<std::string, std::optional<std::string>>& tags, const std::optional<prefix::prefix>& prefix,
 				const std::string& command,
 				const std::vector<std::string>& params) : m_tags(tags), m_prefix(prefix), m_command(command),
 														  m_params(params) {};
@@ -36,7 +57,7 @@ namespace irc {
 
 		static message pong_message(const std::string& daemon1, const std::string& deamon2);
 
-		const std::string& prefix() const { return m_prefix; }
+		const std::optional<prefix::prefix>& prefix() const { return m_prefix; }
 
 		const std::string& command() const { return m_command; }
 
@@ -48,7 +69,7 @@ namespace irc {
 
 	  private:
 		std::map<std::string, std::optional<std::string>> m_tags;
-		std::string m_prefix;
+		std::optional<irc::prefix::prefix> m_prefix;
 		std::string m_command;
 		std::vector<std::string> m_params;
 	};
