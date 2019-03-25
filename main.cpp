@@ -54,24 +54,30 @@ int main() {
 			std::cout << sender << " : " << message << std::endl;
 			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
 				break;
-		} /*else if (tmp.command() == "USERNOTICE") {
-			auto tags = tmp.tags();
-			if (tags.at("msg-id").has_value()) {
-				if (tags.at("msg-id").value() == "sub") {
-					std::string user;
-					if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
-						user = tags.at("display-name").value();
-					} else user = tags.at("login").value();
-					bot.send_message("fattySub fattySub fattySub Vítej " + user + " do tučné rodiny fattySub fattySub fattySub", channel);
-				} else if (tags.at("msg-id").value() == "resub") {
-					std::string user;
-					if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
-						user = tags.at("display-name").value();
-					} else user = tags.at("login").value();
-					bot.send_message("fattySub fattySub fattySub Vítej zpátky " + user + " do tučné rodiny fattySub fattySub fattySub", channel);
-				} else std::cout << tmp.to_irc_message();
+		} else {
+			std::cout << tmp.to_irc_message();
+			if (tmp.command() == "USERNOTICE") {
+				auto tags = tmp.tags();
+				if (tags.at("msg-id").has_value()) {
+					if (tags.at("msg-id").value() == "sub") {
+						std::string user;
+						if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
+							user = tags.at("display-name").value();
+						} else user = tags.at("login").value();
+						bot.send_message(
+						  "fattySub fattySub fattySub Vítej " + user + " do tučné rodiny fattySub fattySub fattySub",
+						  channel);
+					} else if (tags.at("msg-id").value() == "resub") {
+						std::string user;
+						if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
+							user = tags.at("display-name").value();
+						} else user = tags.at("login").value();
+						bot.send_message("fattySub fattySub fattySub Vítej zpátky " + user +
+										 " do tučné rodiny fattySub fattySub fattySub", channel);
+					}
+				}
 			}
-		}*/ else std::cout << tmp.to_irc_message();
+		}
 	}
 	return 0;
 }
