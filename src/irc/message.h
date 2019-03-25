@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include <optional>
+#include <memory>
 
 namespace irc {
 	class message {
@@ -22,6 +23,18 @@ namespace irc {
 														  m_params(params) {};
 
 		static message private_message(const std::string& message_text, const std::string& channel);
+
+		static message pass_message(const std::string& password);
+
+		static message nick_message(const std::string& nickname);
+
+		static message join_message(const std::vector<std::string>& channels, const std::vector<std::string>& keys = {});
+
+		static message part_message(const std::vector<std::string>& channels);
+
+		static message pong_message(const std::string& daemon);
+
+		static message pong_message(const std::string& daemon1, const std::string& deamon2);
 
 		const std::string& prefix() const { return m_prefix; }
 

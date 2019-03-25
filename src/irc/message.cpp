@@ -10,32 +10,9 @@ using std::pair;
 using std::make_pair;
 using std::nullopt;
 using std::replace;
-
-static string escapeTagValue(const string& tagValue) {
-	string escapedTagValue;
-	for (char c : tagValue) {
-		switch (c) {
-			case ' ':
-				escapedTagValue += "\\s";
-				break;
-			case '\r':
-				escapedTagValue += "\\r";
-				break;
-			case '\n':
-				escapedTagValue += "\\n";
-				break;
-			case '\\':
-				escapedTagValue += "\\\\";
-				break;
-			case ';':
-				escapedTagValue += "\\:";
-				break;
-			default:
-				escapedTagValue.push_back(c);
-		}
-	}
-	return escapedTagValue;
-}
+using std::shared_ptr;
+using std::make_shared;
+using irc::message;
 
 namespace irc_parsing {
 	static string parseKey(string::const_iterator& it, const string::const_iterator& end) {
@@ -166,7 +143,33 @@ namespace irc_parsing {
 	}
 }
 
-irc::message::message(const string& rawMessage) {
+static string escapeTagValue(const string& tagValue) {
+	string escapedTagValue;
+	for (char c : tagValue) {
+		switch (c) {
+			case ' ':
+				escapedTagValue += "\\s";
+				break;
+			case '\r':
+				escapedTagValue += "\\r";
+				break;
+			case '\n':
+				escapedTagValue += "\\n";
+				break;
+			case '\\':
+				escapedTagValue += "\\\\";
+				break;
+			case ';':
+				escapedTagValue += "\\:";
+				break;
+			default:
+				escapedTagValue.push_back(c);
+}
+	}
+	return escapedTagValue;
+}
+
+message::message(const string& rawMessage) {
 	auto it = rawMessage.begin();
 	auto end = rawMessage.end();
 	m_tags = irc_parsing::parseTags(it, end);
@@ -180,11 +183,11 @@ irc::message::message(const string& rawMessage) {
 	assert(it == end);
 }
 
-irc::message irc::message::private_message(const std::string& message_text, const std::string& channel) {
-	return irc::message({}, "", "PRIVMSG", {"#" + channel, message_text});
+message message::private_message(const string& message_text, const string& channel) {
+	return message({}, "", "PRIVMSG", {"#" + channel, message_text});
 }
 
-string irc::message::to_irc_message() const {
+string message::to_irc_message() const {
 	string rawMessage;
 	if (!m_tags.empty()) {
 		auto it = m_tags.begin();
@@ -213,4 +216,47 @@ string irc::message::to_irc_message() const {
 	}
 	rawMessage += "\r\n";
 	return rawMessage;
+}
+
+message message::pass_message(const string& password) {
+	return message({}, "", "PASS", {password});
+}
+
+message message::nick_message(const string& nickname) {
+	return message({}, "", "NICK", {nickname});
+}
+
+message message::join_message(const vector<string>& channels, const vector<string>& keys) {
+	string channels_param;
+	assert(!channels.empty());
+	auto c_it = channels.cbegin();
+	channels_param = "#" + *c_it;
+	for (c_it++; c_it != channels.cend(); c_it++)
+		channels_param+=",#"+ *c_it;
+	string keys_param;
+	if (!keys.empty()) {
+		auto k_it = keys.cbegin();
+		keys_param = *k_it;
+		for (k_it++; k_it != keys.cend(); k_it++)
+			keys_param+= "," + *k_it;
+	}
+	return message({}, "", "JOIN", {channels_param, keys_param});
+}
+
+message message::part_message(const vector<string>& channels) {
+	string channels_param;
+	assert(!channels.empty());
+	auto c_it = channels.cbegin();
+	channels_param = "#" + *c_it;
+	for (c_it++; c_it != channels.cend(); c_it++)
+		channels_param+=",#"+ *c_it;
+	return message({}, "", "PART", {channels_param});
+}
+
+message message::pong_message(const string& daemon) {
+	return message({}, "", "PONG", {daemon});
+}
+
+message message::pong_message(const string& daemon1, const string& daemon2) {
+	return message({}, "", "PONG", {daemon1, daemon2});
 }

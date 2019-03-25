@@ -23,7 +23,7 @@ class twitch_bot {
 
 	irc::message read_message(unsigned int timeout = 0);
 
-	bool part_channel();
+	bool part_channel(const std::string& channel);
 
 	bool join_channel(const std::string& channel);
 

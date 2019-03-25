@@ -12,10 +12,8 @@ twitch_bot::twitch_bot() : m_irc_client(U("wss://irc-ws.chat.twitch.tv:443")) {}
 
 bool twitch_bot::login(const std::string& nickname, const std::string& auth, ...) {
 	assert(!m_logged_in);
-	message passMessage({}, "", "PASS", {auth});
-	message nickMessage({}, "", "NICK", {nickname});
-	if (m_irc_client.send_message(passMessage).wait() != pplx::task_status::completed ||
-		m_irc_client.send_message(nickMessage).wait() != pplx::task_status::completed)
+	if (m_irc_client.send_message(message::pass_message(auth)).wait() != pplx::task_status::completed ||
+		m_irc_client.send_message(message::nick_message(nickname)).wait() != pplx::task_status::completed)
 		return false;
 	message retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "001" || retMessage.prefix() != "tmi.twitch.tv" ||
@@ -67,28 +65,20 @@ message twitch_bot::read_message(unsigned int timeout) {
 	auto tmp_message = m_irc_client.read_message(timeout);
 	if (tmp_message.command() == "PING" && tmp_message.params() == vector<string>{"tmi.twitch.tv"}) {
 		std::cout << "PING" << std::endl;
-		m_irc_client.send_message(message({}, "", "PONG", {"tmi.twitch.tv"}));
+		m_irc_client.send_message(message::pong_message("tmi.twitch.tv"));
 		return read_message(timeout); // TODO should subtract time elapsed so far
 	}
 	return tmp_message;
 }
 
-bool twitch_bot::part_channel() {
+bool twitch_bot::part_channel(const string& channel) {
 	assert(m_logged_in);
-	assert(m_joined_channel);
-	message partMessage({}, "", "PART", {"#" + m_channel});
-	if (m_irc_client.send_message(partMessage).wait() != pplx::task_status::completed)
-		return false;
-	m_joined_channel = false;
-	return true;
+	return !(m_irc_client.send_message(message::part_message({channel})).wait() != pplx::task_status::completed);
 }
 
 bool twitch_bot::join_channel(const std::string& channel) {
 	assert(m_logged_in);
-	if (m_joined_channel)
-		part_channel();
-	message joinMessage({}, "", "JOIN", {"#" + channel});
-	if (m_irc_client.send_message(joinMessage).wait() != pplx::task_status::completed)
+	if (m_irc_client.send_message(message::join_message({channel})).wait() != pplx::task_status::completed)
 		return false;
 
 	message responseMessage = m_irc_client.read_message();
