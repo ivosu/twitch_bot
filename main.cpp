@@ -79,42 +79,6 @@ int main() {
 					bot.send_message("fattySub fattySub fattySub Vítej " + std::string(msg_id == "resub" ? "zpátky " : "") + user +
 									 " do naší tučné rodiny fattySub fattySub fattySub", channel);
 				}
-				/*
-				try {
-					if (tags.at("msg-id").has_value()) {
-						if (tags.at("msg-id").value() == "sub") {
-							std::string user;
-							try {
-								if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
-									user = tags.at("display-name").value();
-								} else {
-									try {
-										user = tags.at("login").value();
-									} catch (const std::out_of_range& e) {
-										// No nick????
-									}
-								}
-							} catch (const std::out_of_range& e) {
-
-							}
-						}
-					}
-				} catch (const std::out_of_range& e) {
-
-				}
-
-						} else
-						bot.send_message(
-						  "fattySub fattySub fattySub Vítej " + user + " do tučné rodiny fattySub fattySub fattySub",
-						  channel);
-					} else if (tags.at("msg-id").value() == "resub") {
-						std::string user;
-						if (tags.at("display-name").has_value() && !tags.at("display-name").value().empty()) {
-							user = tags.at("display-name").value();
-						} else user = tags.at("login").value();
-
-					}
-				}*/
 			}
 		}
 	}
