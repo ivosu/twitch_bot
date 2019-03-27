@@ -19,8 +19,8 @@ int main() {
 		std::cerr << "Failed to load login info" << std::endl;
 		return 1;
 	}
-	//std::string channel = "fattypillow";
-	std::string channel = "ivosu";
+	std::string channel = "fattypillow";
+	//std::string channel = "ivosu";
 
 	if (!bot.login(username, auth)) {
 		std::cerr << "Failed to login" << std::endl;
@@ -33,23 +33,11 @@ int main() {
 
 	bot.cap_req({"twitch.tv/commands", "twitch.tv/tags"});
 
-	std::cout<<"Chat connected"<<std::endl;
+	std::cout << "Chat connected" << std::endl;
 	while (true) {
 		irc::message tmp = bot.read_message();
 		if (tmp.command() == "PRIVMSG") {
-			std::string sender;
-			try{
-				auto tags = tmp.tags();
-				if (tags.at("display-name").has_value()) {
-					sender = tags["display-name"].value();
-				} else {
-					assert(tmp.prefix().has_value());
-					sender = tmp.prefix().value().main();
-				}
-			} catch (const std::out_of_range& e) {
-				assert(tmp.prefix().has_value());
-				sender = tmp.prefix().value().main();
-			}
+			std::string sender = twitch_bot::get_user_name_private_message(tmp);
 			std::string message = *tmp.params().rbegin();
 			std::cout << sender << " : " << message << std::endl;
 			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
@@ -63,21 +51,16 @@ int main() {
 					continue;
 				const std::string& msg_id = msg_id_it->second.value();
 				if (msg_id == "sub" || msg_id == "resub") {
-					std::string user;
-					auto display_name_it = tags.find("display-name");
-					if (display_name_it != tags.cend() && display_name_it->second.has_value() && !display_name_it->second.value().empty()) {
-						user = display_name_it->second.value();
-					} else {
-						auto login_it = tags.find("login");
-						if (login_it != tags.cend() && login_it->second.has_value() && !login_it->second.value().empty()) {
-							user = login_it->second.value();
-						} else {
-							// DAFAK?
-							continue;
-						}
-					}
-					bot.send_message("fattySub fattySub fattySub Vítej " + std::string(msg_id == "resub" ? "zpátky " : "") + user +
-									 " do naší tučné rodiny fattySub fattySub fattySub", channel);
+					std::string user = twitch_bot::get_user_name_from_user_notice_tags(tags);
+					bot.send_message(
+					  "fattySub fattySub fattySub Vítej " + std::string(msg_id == "resub" ? "zpátky " : "") + user +
+					  " do naší tučné rodiny fattySub fattySub fattySub", channel);
+				} else if (msg_id == "subgift" || msg_id == "anonsubgift") {
+					std::string gifter = twitch_bot::get_user_name_from_user_notice_tags(tags);
+					std::string gifted = twitch_bot::get_gifted_recipient_user_name(tags);
+					bot.send_message(
+					  "fattySub fattySub fattySub Vítej " + gifted + " do naší tučné rodiny fattySub fattySub fattySub",
+					  channel);
 				}
 			}
 		}

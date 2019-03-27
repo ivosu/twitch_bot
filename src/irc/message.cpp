@@ -120,7 +120,7 @@ namespace irc_parsing {
 		vector<string> parsedParams;
 		while (it != end && *it == ' ') {
 			SKIP_WHITESPACES(it, end);
-			if(it == end)
+			if (it == end)
 				return parsedParams;
 			if (*it != ':')
 				parsedParams.push_back(parse_middle_param(it, end));
@@ -155,7 +155,7 @@ namespace irc_parsing {
 		if (it != end && *it == '@') { // Host part of prefix is present
 			it++; // Eat '@'
 			assert(it != end);
-			while(it != end && *it != ' ') // Parse host part
+			while (it != end && *it != ' ') // Parse host part
 				host.push_back(*it++);
 			assert(!host.empty());
 			res_host = make_optional(host);
@@ -188,7 +188,7 @@ static string escapeTagValue(const string& tagValue) {
 				break;
 			default:
 				escapedTagValue.push_back(c);
-}
+		}
 	}
 	return escapedTagValue;
 }
@@ -225,13 +225,13 @@ message message::join_message(const vector<string>& channels, const vector<strin
 	auto c_it = channels.cbegin();
 	channels_param = "#" + *c_it;
 	for (c_it++; c_it != channels.cend(); c_it++)
-		channels_param+=",#"+ *c_it;
+		channels_param += ",#" + *c_it;
 	string keys_param;
 	if (!keys.empty()) {
 		auto k_it = keys.cbegin();
 		keys_param = *k_it;
 		for (k_it++; k_it != keys.cend(); k_it++)
-			keys_param+= "," + *k_it;
+			keys_param += "," + *k_it;
 	}
 	return message({}, nullopt, "JOIN", {channels_param, keys_param});
 }
@@ -242,7 +242,7 @@ message message::part_message(const vector<string>& channels) {
 	auto c_it = channels.cbegin();
 	channels_param = "#" + *c_it;
 	for (c_it++; c_it != channels.cend(); c_it++)
-		channels_param+=",#"+ *c_it;
+		channels_param += ",#" + *c_it;
 	return message({}, nullopt, "PART", {channels_param});
 }
 

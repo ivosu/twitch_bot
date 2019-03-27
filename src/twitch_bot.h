@@ -30,6 +30,13 @@ class twitch_bot {
 
 	void cap_req(const std::vector<std::string>& capabilities);
 
+	static std::string
+	get_user_name_from_user_notice_tags(const std::map<std::string, std::optional<std::string>>& tags);
+
+	static std::string get_user_name_private_message(const irc::message& message);
+
+	static std::string get_gifted_recipient_user_name(const std::map<std::string, std::optional<std::string>>& tags);
+
   private:
 	irc::irc_client m_irc_client;
 	std::string m_nickname;

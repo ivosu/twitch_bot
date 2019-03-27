@@ -38,7 +38,8 @@ namespace irc {
 	  public:
 		message(const std::string& rawMessage);
 
-		message(const std::map<std::string, std::optional<std::string>>& tags, const std::optional<prefix::prefix>& prefix,
+		message(const std::map<std::string, std::optional<std::string>>& tags,
+				const std::optional<prefix::prefix>& prefix,
 				const std::string& command,
 				const std::vector<std::string>& params) : m_tags(tags), m_prefix(prefix), m_command(command),
 														  m_params(params) {};
@@ -49,7 +50,8 @@ namespace irc {
 
 		static message nick_message(const std::string& nickname);
 
-		static message join_message(const std::vector<std::string>& channels, const std::vector<std::string>& keys = {});
+		static message
+		join_message(const std::vector<std::string>& channels, const std::vector<std::string>& keys = {});
 
 		static message part_message(const std::vector<std::string>& channels);
 
