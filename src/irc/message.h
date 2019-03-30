@@ -76,11 +76,11 @@ namespace irc {
 
 		class parsing_error : public std::exception {
 		  public:
-			parsing_error(const char* message) : m_message(message) {}
+			parsing_error(const char *message) : m_message(message) {}
 
 			parsing_error(const std::string& message) : m_message(message) {}
 
-			const char* what() const noexcept final {
+			const char *what() const noexcept final {
 				return "Message parsing error";
 			}
 

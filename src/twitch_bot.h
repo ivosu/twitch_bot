@@ -23,6 +23,10 @@ class twitch_bot {
 
 	irc::message read_message();
 
+	irc::message await_specific_command(const std::string& command, const std::chrono::milliseconds& timeout);
+
+	irc::message await_specific_command(const std::string& command);
+
 	bool part_channel(const std::string& channel);
 
 	bool join_channel(const std::string& channel);
@@ -43,6 +47,7 @@ class twitch_bot {
 	std::string m_nickname;
 	bool m_logged_in = false;
 	std::set<std::string> m_joined_channels;
+	std::list<irc::message> m_handle_later_messages;
 };
 
 #endif //TWITCH_IRC_TWITCHBOT_H

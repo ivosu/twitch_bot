@@ -18,12 +18,12 @@ using irc::tags_t;
 using irc::prefix_t;
 
 #define SKIP_WHITESPACES(it, end) do {\
-	(it)++;\
+    (it)++;\
 } while ((it) != (end) && *(it) == ' ')
 
 #define SKIP_WHITESPACES_THROW_END(it, end, parsed_part) SKIP_WHITESPACES((it), (end));\
-	if ((it) == (end))\
-		throw message::parsing_error("Message ended while parsing " + string((parsed_part)));
+    if ((it) == (end))\
+        throw message::parsing_error("Message ended while parsing " + string((parsed_part)));
 
 namespace irc_parsing {
 	static string parse_key(string::const_iterator& it, const string::const_iterator& end) {
@@ -116,19 +116,19 @@ namespace irc_parsing {
 			if (!isdigit(*it))
 				throw message::parsing_error("Message command is in wrong format");
 			command.push_back(*it++);
-			if (it == end){
-					throw message::parsing_error("Message ended while parsing number command");
-			}
-			if (!isdigit(*it))
-				throw message::parsing_error("Message command is in wrong format");
-			command.push_back(*it++);
-			if (it == end){
+			if (it == end) {
 				throw message::parsing_error("Message ended while parsing number command");
 			}
 			if (!isdigit(*it))
 				throw message::parsing_error("Message command is in wrong format");
 			command.push_back(*it++);
-			if (it == end){
+			if (it == end) {
+				throw message::parsing_error("Message ended while parsing number command");
+			}
+			if (!isdigit(*it))
+				throw message::parsing_error("Message command is in wrong format");
+			command.push_back(*it++);
+			if (it == end) {
 				if (crlf_included)
 					throw message::parsing_error("Message ended while parsing number command");
 			}
@@ -136,7 +136,8 @@ namespace irc_parsing {
 		return command;
 	}
 
-	static string parse_middle_param(string::const_iterator& it, const string::const_iterator& end, bool crlf_included) {
+	static string
+	parse_middle_param(string::const_iterator& it, const string::const_iterator& end, bool crlf_included) {
 		string param;
 		while (*it != ' ' && *it != '\r' && *it != '\n' && *it != '\0') {
 			param.push_back(*it++);
@@ -151,7 +152,8 @@ namespace irc_parsing {
 		return param;
 	}
 
-	static string parse_trailing_param(string::const_iterator& it, const string::const_iterator& end, bool crlf_included) {
+	static string
+	parse_trailing_param(string::const_iterator& it, const string::const_iterator& end, bool crlf_included) {
 		string param;
 		while (*it != '\r' && *it != '\n' && *it != '\0') {
 			param.push_back(*it++);
@@ -164,9 +166,10 @@ namespace irc_parsing {
 		return param;
 	}
 
-	static vector<string> parse_params(string::const_iterator& it, const string::const_iterator& end, bool crlf_included) {
+	static vector<string>
+	parse_params(string::const_iterator& it, const string::const_iterator& end, bool crlf_included) {
 		vector<string> parsedParams;
-		if (it == end){
+		if (it == end) {
 			assert(!crlf_included);
 			return parsedParams;
 		}
@@ -223,7 +226,7 @@ namespace irc_parsing {
 				if (it == end)
 					throw message::parsing_error("Message ended while parsing prefix");
 			}
-			if(user.empty())
+			if (user.empty())
 				throw message::parsing_error("Empty user part in prefix");
 			res_user = make_optional(user);
 		}
@@ -236,7 +239,7 @@ namespace irc_parsing {
 				if (it == end)
 					throw message::parsing_error("Message ended while parsing prefix");
 			}
-			if(host.empty())
+			if (host.empty())
 				throw message::parsing_error("Empty host part in prefix");
 			res_host = make_optional(host);
 		}

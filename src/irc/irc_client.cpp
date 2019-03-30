@@ -26,45 +26,45 @@ using web::websockets::client::websocket_exception;
 
 task<void> irc_client::create_infinite_receive_task(const cancellation_token& cancellation_token) {
 	return create_task(
-	  [=]() -> void {
-		  while (true) {
-			  if (cancellation_token.is_canceled())
-				  cancel_current_task();
-			  try {
-				  if (m_client.receive().then([](websocket_incoming_message msg) {
-					  return msg.extract_string();
-				  }, cancellation_token).then([=](string body) {
-					  istringstream is(body);
-					  string tmp;
-					  while (getline(is, tmp)) {
-						  tmp.pop_back();
-						  if (m_handle_ping) {
-							  try {
-								  message message(tmp, false);
-								  if (message.command() == "PING")
-									  send_message(message::pong_message(*message.params().begin()));
-								  else
-									  m_queued_messages.emplace(message);
-							  } catch (const message::parsing_error& e) {
-							  	cerr<<tmp<<" : "<<e.message()<<endl;
-							  	continue;
-							  }
-						  } else {
-							  try {
-								  m_queued_messages.emplace(tmp, false);
-							  } catch (const message::parsing_error& e) {
-								  cerr<<tmp<<" : "<<e.message()<<endl;
-								  continue;
-							  }
-						  }
-					  }
-				  }, cancellation_token).wait() == canceled)
-					  cancel_current_task();
-			  } catch (const websocket_exception& e) {
-				  cancel_current_task();
-			  }
-		  }
-	  }
+			[=]() -> void {
+				while (true) {
+					if (cancellation_token.is_canceled())
+						cancel_current_task();
+					try {
+						if (m_client.receive().then([](websocket_incoming_message msg) {
+							return msg.extract_string();
+						}, cancellation_token).then([=](string body) {
+							istringstream is(body);
+							string tmp;
+							while (getline(is, tmp)) {
+								tmp.pop_back();
+								if (m_handle_ping) {
+									try {
+										message message(tmp, false);
+										if (message.command() == "PING")
+											send_message(message::pong_message(*message.params().begin()));
+										else
+											m_queued_messages.emplace(message);
+									} catch (const message::parsing_error& e) {
+										cerr << tmp << " : " << e.message() << endl;
+										continue;
+									}
+								} else {
+									try {
+										m_queued_messages.emplace(tmp, false);
+									} catch (const message::parsing_error& e) {
+										cerr << tmp << " : " << e.message() << endl;
+										continue;
+									}
+								}
+							}
+						}, cancellation_token).wait() == canceled)
+							cancel_current_task();
+					} catch (const websocket_exception& e) {
+						cancel_current_task();
+					}
+				}
+			}
 	);
 }
 
