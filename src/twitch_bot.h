@@ -29,7 +29,7 @@ class twitch_bot {
 
 	void on_command(const irc::message& command);
 
-	void cap_req(const std::vector<std::string>& capabilities);
+	bool cap_req(const std::vector<std::string>& capabilities);
 
 	static std::string
 	get_user_name_from_user_notice_tags(const irc::tags_t& tags);

@@ -62,6 +62,8 @@ namespace irc {
 
 		static message capability_request_message(const std::vector<std::string>& capabilities);
 
+		static message& capability_request_end_message();
+
 		const std::optional<prefix_t>& prefix() const { return m_prefix; }
 
 		const std::string& command() const { return m_command; }

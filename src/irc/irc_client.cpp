@@ -37,23 +37,23 @@ task<void> irc_client::create_infinite_receive_task(const cancellation_token& ca
 					  istringstream is(body);
 					  string tmp;
 					  while (getline(is, tmp)) {
-						  tmp += '\n'; // Put back the newline so that parsing is proper
+						  tmp.pop_back();
 						  if (m_handle_ping) {
 							  try {
-								  message message(tmp);
+								  message message(tmp, false);
 								  if (message.command() == "PING")
 									  send_message(message::pong_message(*message.params().begin()));
 								  else
 									  m_queued_messages.emplace(message);
 							  } catch (const message::parsing_error& e) {
-							  	cerr<<tmp<<e.message()<<endl;
+							  	cerr<<tmp<<" : "<<e.message()<<endl;
 							  	continue;
 							  }
 						  } else {
 							  try {
-								  m_queued_messages.emplace(tmp);
+								  m_queued_messages.emplace(tmp, false);
 							  } catch (const message::parsing_error& e) {
-								  cerr<<tmp<<e.message()<<endl;
+								  cerr<<tmp<<" : "<<e.message()<<endl;
 								  continue;
 							  }
 						  }

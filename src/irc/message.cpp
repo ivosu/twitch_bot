@@ -387,6 +387,11 @@ string message::to_irc_message() const {
 	return rawMessage;
 }
 
+message& message::capability_request_end_message() {
+	static message message({}, nullopt, "CAP", {"END"});
+	return message;
+}
+
 string prefix_t::to_irc_prefix() const {
 	string prefix = m_main;
 	if (m_user.has_value())

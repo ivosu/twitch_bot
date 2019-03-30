@@ -65,40 +65,43 @@ bool twitch_bot::login(const string& nickname, const string& auth) {
 	if (m_irc_client.send_message(message::pass_message(auth)).wait() != completed ||
 		m_irc_client.send_message(message::nick_message(nickname)).wait() != completed)
 		return false;
-	message retMessage = m_irc_client.read_message();
-	if (retMessage.command() != "001" || !retMessage.prefix().has_value() ||
-		retMessage.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
-		retMessage.params() != vector<string>{nickname, "Welcome, GLHF!"})
+	message response_message = m_irc_client.read_message();
+	if (response_message.command() != "001" || !response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
+		response_message.params() != vector<string>{nickname, "Welcome, GLHF!"})
 		return false;
-	retMessage = m_irc_client.read_message();
-	if (retMessage.command() != "002" || !retMessage.prefix().has_value() ||
-		retMessage.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
-		retMessage.params() != vector<string>{nickname, "Your host is tmi.twitch.tv"})
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "002" || !response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
+		response_message.params() != vector<string>{nickname, "Your host is tmi.twitch.tv"})
 		return false;
-	retMessage = m_irc_client.read_message();
-	if (retMessage.command() != "003" || !retMessage.prefix().has_value() ||
-		retMessage.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
-		retMessage.params() != vector<string>{nickname, "This server is rather new"})
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "003" || !response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
+		response_message.params() != vector<string>{nickname, "This server is rather new"})
 		return false;
-	retMessage = m_irc_client.read_message();
-	if (retMessage.command() != "004" || !retMessage.prefix().has_value() ||
-		retMessage.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
-		retMessage.params() != vector<string>{nickname, "-"})
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "004" || !response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
+		response_message.params() != vector<string>{nickname, "-"})
 		return false;
-	retMessage = m_irc_client.read_message();
-	if (retMessage.command() != "375" || !retMessage.prefix().has_value() ||
-		retMessage.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
-		retMessage.params() != vector<string>{nickname, "-"})
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "375" || !response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
+		response_message.params() != vector<string>{nickname, "-"})
 		return false;
-	retMessage = m_irc_client.read_message();
-	if (retMessage.command() != "372" || !retMessage.prefix().has_value() ||
-		retMessage.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
-		retMessage.params() != vector<string>{nickname, "You are in a maze of twisty passages, all alike."})
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "372" || !response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
+		response_message.params() != vector<string>{nickname, "You are in a maze of twisty passages, all alike."})
 		return false;
-	retMessage = m_irc_client.read_message();
-	if (retMessage.command() != "376" || !retMessage.prefix().has_value() ||
-		retMessage.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
-		retMessage.params() != vector<string>{nickname, ">"})
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "376" || !response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" ||
+		response_message.params() != vector<string>{nickname, ">"})
+		return false;
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "GLOBALUSERSTATE")
 		return false;
 	m_logged_in = true;
 	m_nickname = nickname;
@@ -138,24 +141,34 @@ bool twitch_bot::join_channel(const string& channel) {
 	if (m_irc_client.send_message(message::join_message({channel})).wait() != completed)
 		return false;
 
-	message responseMessage = m_irc_client.read_message();
-	if (responseMessage.command() != "JOIN" || responseMessage.params() != vector<string>{"#" + channel} ||
-		!responseMessage.prefix().has_value() || responseMessage.prefix().value().to_irc_prefix() !=
+	message response_message = m_irc_client.read_message();
+	if (response_message.command() != "JOIN" || response_message.params() != vector<string>{"#" + channel} ||
+		!response_message.prefix().has_value() || response_message.prefix().value().to_irc_prefix() !=
 												 m_nickname + "!" + m_nickname + "@" + m_nickname + ".tmi.twitch.tv")
 		return false;
 
-	responseMessage = m_irc_client.read_message();
-	if (responseMessage.command() != "353" ||
-		responseMessage.params() != vector<string>{m_nickname, "=", "#" + channel, m_nickname} ||
-		!responseMessage.prefix().has_value() ||
-		responseMessage.prefix().value().to_irc_prefix() != m_nickname + ".tmi.twitch.tv")
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "USERSTATE" || response_message.params() != vector<string>{"#" + channel} ||
+	  response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" )
 		return false;
 
-	responseMessage = m_irc_client.read_message();
-	if (responseMessage.command() != "366" ||
-		responseMessage.params() != vector<string>{m_nickname, "#" + channel, "End of /NAMES list"} ||
-		!responseMessage.prefix().has_value() ||
-		responseMessage.prefix().value().to_irc_prefix() != m_nickname + ".tmi.twitch.tv")
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "ROOMSTATE" || response_message.params() != vector<string>{"#" + channel} ||
+	  response_message.prefix().value().to_irc_prefix() != "tmi.twitch.tv" )
+		return false;
+
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "353" ||
+		response_message.params() != vector<string>{m_nickname, "=", "#" + channel, m_nickname} ||
+		!response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != m_nickname + ".tmi.twitch.tv")
+		return false;
+
+	response_message = m_irc_client.read_message();
+	if (response_message.command() != "366" ||
+		response_message.params() != vector<string>{m_nickname, "#" + channel, "End of /NAMES list"} ||
+		!response_message.prefix().has_value() ||
+		response_message.prefix().value().to_irc_prefix() != m_nickname + ".tmi.twitch.tv")
 		return false;
 	m_joined_channels.insert(channel);
 	return true;
@@ -165,7 +178,19 @@ void twitch_bot::on_command(const message& command) {
 
 }
 
-void twitch_bot::cap_req(const vector<string>& capabilities) {
-
+bool twitch_bot::cap_req(const vector<string>& capabilities) {
 	m_irc_client.send_message(message::capability_request_message(capabilities)).wait();
+	message responce_message = m_irc_client.read_message(milliseconds{3000});
+	vector<string> expected_ack_params = vector<string>{"*", "ACK"};
+	auto c_it = capabilities.cbegin();
+	string capabilities_str = *c_it;
+
+	for (c_it++; c_it != capabilities.cend(); c_it++) {
+		capabilities_str += ' ' + *c_it;
+	}
+	expected_ack_params.push_back(capabilities_str);
+	if (responce_message.command() != "CAP" || responce_message.params() != expected_ack_params)
+		return false;
+	m_irc_client.send_message(message::capability_request_end_message()).wait();
+
 }

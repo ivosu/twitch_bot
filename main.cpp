@@ -19,19 +19,34 @@ int main() {
 		std::cerr << "Failed to load login info" << std::endl;
 		return 1;
 	}
-	std::string channel = "fattypillow";
+	//std::string channel = "fattypillow";
 	//std::string channel = "ivosu";
+	std::string channel = "twitchpresents";
+
+	bot.cap_req({"twitch.tv/commands", "twitch.tv/tags"});
 
 	if (!bot.login(username, auth)) {
 		std::cerr << "Failed to login" << std::endl;
 		return 1;
 	}
-	if (!bot.join_channel(channel)) {
+
+
+	/*if (!bot.join_channel(channel)) {
 		std::cerr << "Failed to join channel " << channel << std::endl;
 		return 1;
 	}
-
-	bot.cap_req({"twitch.tv/commands", "twitch.tv/tags"});
+	if (!bot.join_channel("ivosu")) {
+		std::cerr << "Failed to join channel ivosu" << std::endl;
+		return 1;
+	}*/
+	if (!bot.join_channel("starladder_cs_en")) {
+		std::cerr << "Failed to join channel starladder_cs_en"<<std::endl;
+		return 1;
+	}
+	/*if (!bot.join_channel("lck_korea")) {
+		std::cerr << "Failed to join channel lck_korea" << std::endl;
+		return 1;
+	}*/
 
 	std::cout << "Chat connected" << std::endl;
 	while (true) {
@@ -39,12 +54,12 @@ int main() {
 		if (tmp.command() == "PRIVMSG") {
 			std::string sender = twitch_bot::get_user_name_private_message(tmp);
 			std::string message = *tmp.params().rbegin();
-			std::cout << sender << " : " << message << std::endl;
+			//std::cout << sender << " : " << message << std::endl;
 			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
 				break;
 		} else {
-			std::cout << tmp.to_irc_message();
-			if (tmp.command() == "USERNOTICE") {
+			//std::cout << tmp.to_irc_message();
+			/*if (tmp.command() == "USERNOTICE") {
 				auto tags = tmp.tags();
 				auto msg_id_it = tags.find("msg-id");
 				if (msg_id_it == tags.cend() || !msg_id_it->second.has_value())
@@ -62,7 +77,7 @@ int main() {
 					  "fattySub fattySub fattySub Vítej " + gifted + " do naší tučné rodiny fattySub fattySub fattySub",
 					  channel);
 				}
-			}
+			}*/
 		}
 	}
 	return 0;
