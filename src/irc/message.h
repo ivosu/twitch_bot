@@ -17,7 +17,7 @@ namespace irc {
 	class prefix_t {
 	  public:
 		prefix_t(const std::string& main, const std::optional<std::string>& user,
-			   const std::optional<std::string>& host) : m_main(main), m_user(user), m_host(host) {}
+				 const std::optional<std::string>& host) : m_main(main), m_user(user), m_host(host) {}
 
 		const std::string& main() const { return m_main; }
 
@@ -37,8 +37,7 @@ namespace irc {
 
 	class message {
 	  public:
-
-		message(const std::string& rawMessage);
+		message(const std::string& rawMessage, bool crlf_included = true);
 
 		message(const tags_t& tags,
 				const std::optional<prefix_t>& prefix,
@@ -73,10 +72,31 @@ namespace irc {
 
 		std::string to_irc_message() const;
 
+		class parsing_error : public std::exception {
+		  public:
+			parsing_error(const char* message) : m_message(message) {}
+
+			parsing_error(const std::string& message) : m_message(message) {}
+
+			const char* what() const noexcept final {
+				return "Message parsing error";
+			}
+
+			const std::string& message() const {
+				return m_message;
+			}
+
+		  private:
+			std::string m_message;
+		};
+
 	  private:
 		tags_t m_tags;
+
 		std::optional<prefix_t> m_prefix;
+
 		std::string m_command;
+
 		std::vector<std::string> m_params;
 	};
 }
