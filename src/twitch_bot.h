@@ -10,17 +10,18 @@
 #include <string>
 #include <set>
 
-
 class twitch_bot {
   public:
 
 	twitch_bot();
 
-	bool login(const std::string& nickname, const std::string& auth, ...);
+	bool login(const std::string& nickname, const std::string& auth);
 
 	pplx::task<void> send_message(const std::string& message, const std::string& channel);
 
-	irc::message read_message(unsigned int timeout = 0);
+	irc::message read_message(const std::chrono::milliseconds& timeout);
+
+	irc::message read_message();
 
 	bool part_channel(const std::string& channel);
 
@@ -31,11 +32,11 @@ class twitch_bot {
 	void cap_req(const std::vector<std::string>& capabilities);
 
 	static std::string
-	get_user_name_from_user_notice_tags(const std::map<std::string, std::optional<std::string>>& tags);
+	get_user_name_from_user_notice_tags(const irc::tags_t& tags);
 
 	static std::string get_user_name_private_message(const irc::message& message);
 
-	static std::string get_gifted_recipient_user_name(const std::map<std::string, std::optional<std::string>>& tags);
+	static std::string get_gifted_recipient_user_name(const irc::tags_t& tags);
 
   private:
 	irc::irc_client m_irc_client;

@@ -8,12 +8,16 @@ using std::string;
 using std::vector;
 using std::back_inserter;
 using std::nullopt;
-using irc::message;
-using std::map;
 using std::optional;
+using std::chrono::milliseconds;
 
+using irc::message;
+using irc::tags_t;
 
-string twitch_bot::get_user_name_from_user_notice_tags(const map<string, optional<string>>& tags) {
+using pplx::task;
+using pplx::task_status::completed;
+
+string twitch_bot::get_user_name_from_user_notice_tags(const tags_t& tags) {
 	auto display_name_it = tags.find("display-name");
 	if (display_name_it != tags.cend() && display_name_it->second.has_value() &&
 		!display_name_it->second.value().empty())
@@ -27,7 +31,7 @@ string twitch_bot::get_user_name_from_user_notice_tags(const map<string, optiona
 	}
 }
 
-string twitch_bot::get_gifted_recipient_user_name(const map<string, optional<string>>& tags) {
+string twitch_bot::get_gifted_recipient_user_name(const tags_t& tags) {
 	auto display_name_it = tags.find("msg-param-recipient-display-name");
 	if (display_name_it != tags.end() && display_name_it->second.has_value() &&
 		!display_name_it->second.value().empty())
@@ -54,12 +58,12 @@ string twitch_bot::get_user_name_private_message(const message& message) {
 	}
 }
 
-twitch_bot::twitch_bot() : m_irc_client(U("wss://irc-ws.chat.twitch.tv:443")) {}
+twitch_bot::twitch_bot() : m_irc_client(U("wss://irc-ws.chat.twitch.tv:443"), true) {}
 
-bool twitch_bot::login(const std::string& nickname, const std::string& auth, ...) {
+bool twitch_bot::login(const string& nickname, const string& auth) {
 	assert(!m_logged_in);
-	if (m_irc_client.send_message(message::pass_message(auth)).wait() != pplx::task_status::completed ||
-		m_irc_client.send_message(message::nick_message(nickname)).wait() != pplx::task_status::completed)
+	if (m_irc_client.send_message(message::pass_message(auth)).wait() != completed ||
+		m_irc_client.send_message(message::nick_message(nickname)).wait() != completed)
 		return false;
 	message retMessage = m_irc_client.read_message();
 	if (retMessage.command() != "001" || !retMessage.prefix().has_value() ||
@@ -101,38 +105,37 @@ bool twitch_bot::login(const std::string& nickname, const std::string& auth, ...
 	return true;
 }
 
-pplx::task<void> twitch_bot::send_message(const std::string& message, const std::string& channel) {
+task<void> twitch_bot::send_message(const string& message, const string& channel) {
 	assert(m_logged_in);
 	assert(m_joined_channels.find(channel) != m_joined_channels.end());
 	return m_irc_client.send_message(message::private_message(message, channel));
 }
 
-message twitch_bot::read_message(unsigned int timeout) {
+message twitch_bot::read_message(const milliseconds& timeout) {
 	assert(m_logged_in);
-	auto tmp_message = m_irc_client.read_message(timeout);
-	if (tmp_message.command() == "PING" && tmp_message.params() == vector<string>{"tmi.twitch.tv"}) {
-		std::cout << "PING" << std::endl;
-		m_irc_client.send_message(message::pong_message("tmi.twitch.tv"));
-		return read_message(timeout); // TODO should subtract time elapsed so far
-	}
-	return tmp_message;
+	return m_irc_client.read_message(timeout);
+}
+
+message twitch_bot::read_message() {
+	assert(m_logged_in);
+	return m_irc_client.read_message();
 }
 
 bool twitch_bot::part_channel(const string& channel) {
 	assert(m_logged_in);
 	assert(m_joined_channels.find(channel) != m_joined_channels.end());
-	if (m_irc_client.send_message(message::part_message({channel})).wait() == pplx::task_status::completed) {
+	if (m_irc_client.send_message(message::part_message({channel})).wait() == completed) {
 		m_joined_channels.erase(channel);
 		return true;
 	}
 	return false;
 }
 
-bool twitch_bot::join_channel(const std::string& channel) {
+bool twitch_bot::join_channel(const string& channel) {
 	assert(m_logged_in);
 	if (m_joined_channels.find(channel) != m_joined_channels.end())
 		return true;
-	if (m_irc_client.send_message(message::join_message({channel})).wait() != pplx::task_status::completed)
+	if (m_irc_client.send_message(message::join_message({channel})).wait() != completed)
 		return false;
 
 	message responseMessage = m_irc_client.read_message();

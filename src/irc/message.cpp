@@ -4,7 +4,6 @@
 
 using std::string;
 using std::vector;
-using std::map;
 using std::optional;
 using std::nullopt;
 using std::make_optional;
@@ -13,8 +12,10 @@ using std::make_pair;
 using std::replace;
 using std::shared_ptr;
 using std::make_shared;
+
 using irc::message;
-using irc::prefix::prefix;
+using irc::tags_t;
+using irc::prefix_t;
 
 #define SKIP_WHITESPACES(it, end) do { it++; } while(it != end && *it == ' ')
 
@@ -69,8 +70,8 @@ namespace irc_parsing {
 			return make_pair(key, nullopt);
 	}
 
-	static map<string, optional<string>> parse_tags(string::const_iterator& it, const string::const_iterator& end) {
-		map<string, optional<string>> parsedTags;
+	static tags_t parse_tags(string::const_iterator& it, const string::const_iterator& end) {
+		tags_t parsedTags;
 		if (it == end || *it != '@') {
 			return parsedTags;
 		}
@@ -133,7 +134,7 @@ namespace irc_parsing {
 		return parsedParams;
 	}
 
-	static optional<prefix> parse_prefix(string::const_iterator& it, const string::const_iterator& end) {
+	static optional<prefix_t> parse_prefix(string::const_iterator& it, const string::const_iterator& end) {
 		if (it == end || *it != ':')
 			return nullopt;
 		it++; // Eat ':'
@@ -163,7 +164,7 @@ namespace irc_parsing {
 		assert(it != end && *it == ' ');
 		SKIP_WHITESPACES(it, end);
 
-		return prefix(main, res_user, res_host);
+		return prefix_t(main, res_user, res_host);
 	}
 }
 
@@ -298,7 +299,7 @@ string message::to_irc_message() const {
 	return rawMessage;
 }
 
-string prefix::to_irc_prefix() const {
+string prefix_t::to_irc_prefix() const {
 	string prefix = m_main;
 	if (m_user.has_value())
 		prefix += "!" + m_user.value();

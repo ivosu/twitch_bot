@@ -13,33 +13,35 @@
 #include <memory>
 
 namespace irc {
-	namespace prefix {
-		class prefix {
-		  public:
-			prefix(const std::string& main, const std::optional<std::string>& user,
-				   const std::optional<std::string>& host) : m_main(main), m_user(user), m_host(host) {}
 
-			const std::string& main() const { return m_main; }
+	class prefix_t {
+	  public:
+		prefix_t(const std::string& main, const std::optional<std::string>& user,
+			   const std::optional<std::string>& host) : m_main(main), m_user(user), m_host(host) {}
 
-			const std::optional<std::string>& user() const { return m_user; }
+		const std::string& main() const { return m_main; }
 
-			const std::optional<std::string>& host() const { return m_host; }
+		const std::optional<std::string>& user() const { return m_user; }
 
-			std::string to_irc_prefix() const;
+		const std::optional<std::string>& host() const { return m_host; }
 
-		  private:
-			std::string m_main;
-			std::optional<std::string> m_user;
-			std::optional<std::string> m_host;
-		};
-	}
+		std::string to_irc_prefix() const;
+
+	  private:
+		std::string m_main;
+		std::optional<std::string> m_user;
+		std::optional<std::string> m_host;
+	};
+
+	typedef std::map<std::string, std::optional<std::string>> tags_t;
 
 	class message {
 	  public:
+
 		message(const std::string& rawMessage);
 
-		message(const std::map<std::string, std::optional<std::string>>& tags,
-				const std::optional<prefix::prefix>& prefix,
+		message(const tags_t& tags,
+				const std::optional<prefix_t>& prefix,
 				const std::string& command,
 				const std::vector<std::string>& params) : m_tags(tags), m_prefix(prefix), m_command(command),
 														  m_params(params) {};
@@ -61,19 +63,19 @@ namespace irc {
 
 		static message capability_request_message(const std::vector<std::string>& capabilities);
 
-		const std::optional<prefix::prefix>& prefix() const { return m_prefix; }
+		const std::optional<prefix_t>& prefix() const { return m_prefix; }
 
 		const std::string& command() const { return m_command; }
 
 		const std::vector<std::string>& params() const { return m_params; }
 
-		const std::map<std::string, std::optional<std::string>>& tags() const { return m_tags; }
+		const tags_t& tags() const { return m_tags; }
 
 		std::string to_irc_message() const;
 
 	  private:
-		std::map<std::string, std::optional<std::string>> m_tags;
-		std::optional<irc::prefix::prefix> m_prefix;
+		tags_t m_tags;
+		std::optional<prefix_t> m_prefix;
 		std::string m_command;
 		std::vector<std::string> m_params;
 	};

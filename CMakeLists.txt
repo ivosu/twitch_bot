@@ -7,8 +7,8 @@ find_library(CONFIG config++)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pedantic -Wall -Wextra -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pedantic -Wall -Wextra -Wall -pthread")
 
-add_executable(twitch_irc main.cpp src/twitch_bot.cpp src/irc/irc_client.cpp src/irc/message.cpp)
+add_executable(twitch_irc main.cpp src/twitch_bot.cpp src/irc/irc_client.cpp src/irc/message.cpp src/tst_queue.h)
 
 target_link_libraries(twitch_irc ${CPPREST} ${BOOST} ${CONFIG})
