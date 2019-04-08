@@ -36,7 +36,7 @@ int main() {
 		}
 	}
 
-	std::cout << "Chat connected" << std::endl;
+	std::cerr << "Chat connected" << std::endl;
 	while (true) {
 		irc::message tmp = bot.read_message();
 		if (tmp.command() == "PRIVMSG") {
@@ -44,9 +44,11 @@ int main() {
 			std::string message = *tmp.params().rbegin();
 			std::string channel = tmp.params().front();
 			channel.erase(channel.begin());
-			std::cout << sender << "@" << channel << ": " << message << std::endl;
 			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
 				break;
+			else if (message.find("ivosu") != std::string::npos || message.find("Ivosu") != std::string::npos) {
+				std::cout << sender << "@" << channel << ": " << message << std::endl;
+			}
 		} else {
 			std::cout << tmp.to_irc_message();
 			if (tmp.command() == "USERNOTICE") {

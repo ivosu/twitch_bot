@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 project(twitch_irc)
 
 find_library(CPPREST cpprest)
-find_library(BOOST boost_system)
 find_library(CONFIG config++)
 
 set(CMAKE_CXX_STANDARD 17)
