@@ -10,7 +10,7 @@
 #include <cpprest/ws_client.h>
 #include <thread>
 #include "message.h"
-#include "../tst_queue.h"
+#include "../tst_queue.hpp"
 
 namespace irc {
 	class irc_client {

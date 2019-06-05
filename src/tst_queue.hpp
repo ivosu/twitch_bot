@@ -2,8 +2,8 @@
 // Created by strejivo on 3/29/19.
 //
 
-#ifndef TWITCH_IRC_TST_QUEUE_H
-#define TWITCH_IRC_TST_QUEUE_H
+#ifndef TWITCH_IRC_TST_QUEUE_HPP
+#define TWITCH_IRC_TST_QUEUE_HPP
 
 #include <queue>
 #include <mutex>
@@ -15,11 +15,19 @@ class tst_queue {
   public:
 
 	void push(T&& val) {
-		m_queue.push(val);
+		{
+			std::lock_guard lock(m_mutex);
+			m_queue.push(val);
+		}
+		m_cond_var.notify_one();
 	}
 
 	void push(const T& val) {
-		m_queue.push(val);
+		{
+			std::lock_guard lock(m_mutex);
+			m_queue.push(val);
+		}
+		m_cond_var.notify_one();
 	}
 
 	template<typename... Args>
@@ -57,4 +65,4 @@ class tst_queue {
 	std::condition_variable m_cond_var;
 };
 
-#endif //TWITCH_IRC_TST_QUEUE_H
+#endif //TWITCH_IRC_TST_QUEUE_HPP
