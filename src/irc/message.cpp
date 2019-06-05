@@ -97,7 +97,7 @@ namespace irc_parsing {
 		} while (*it == ';');
 		if (*it != ' ')
 			throw message::parsing_error("Tags do not terminate with space as they should");
-		SKIP_WHITESPACES_THROW_END(it, end, "tags");
+		SKIP_WHITESPACES_THROW_END(it, end, "tags")
 		return parsedTags;
 	}
 
@@ -175,7 +175,7 @@ namespace irc_parsing {
 		}
 		while (*it == ' ') {
 			if (crlf_included) {
-				SKIP_WHITESPACES_THROW_END(it, end, "params");
+				SKIP_WHITESPACES_THROW_END(it, end, "params")
 			} else {
 				SKIP_WHITESPACES(it, end);
 				if (it == end)
