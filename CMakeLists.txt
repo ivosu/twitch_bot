@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pedantic -Wall -Wextra -Wall -pthread")
 
-add_executable(twitch_irc main.cpp src/twitch_bot.cpp src/irc/irc_client.cpp src/irc/message.cpp src/tst_queue.hpp)
+add_executable(twitch_irc main.cpp src/twitch_bot.cpp src/db/mongodb_communicator.cpp src/irc/irc_client.cpp src/irc/message.cpp src/tst_queue.hpp src/db/support/bson_irc_serializer.cpp)
 
 include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
 
