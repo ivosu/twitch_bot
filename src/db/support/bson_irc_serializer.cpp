@@ -3,6 +3,7 @@
 //
 
 #include "bson_irc_serializer.h"
+#include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/stream/helpers.hpp>
@@ -14,98 +15,98 @@ using bsoncxx::builder::stream::open_document;
 using bsoncxx::builder::stream::close_document;
 using bsoncxx::builder::stream::finalize;
 
-bsoncxx::array::value bson_irc_serializer::serializeTags(const irc::tags_t& tags) {
-	auto tagsBsonArray = array{};
+bsoncxx::array::value bson_irc_serializer::serialize_tags(const irc::tags_t& tags) {
+	auto tags_bson_array = array{};
 
 	for (const auto& tag : tags) {
 		if (tag.second.has_value()) {
-			tagsBsonArray << open_document << tag.first << tag.second.value() << close_document;
+			tags_bson_array << open_document << tag.first << tag.second.value() << close_document;
 		} else {
-			tagsBsonArray << tag.first;
+			tags_bson_array << tag.first;
 		}
 	}
 
-	return tagsBsonArray << finalize;
+	return tags_bson_array << finalize;
 }
 
-bsoncxx::array::value bson_irc_serializer::serializeParams(const std::vector<std::string>& params) {
-	auto paramsBsonArray = array{};
+bsoncxx::array::value bson_irc_serializer::serialize_params(const std::vector<std::string>& params) {
+	auto params_bson_array = array{};
 
 	for (const std::string& param : params) {
-		paramsBsonArray << param;
+		params_bson_array << param;
 	}
 
-	return paramsBsonArray << finalize;
+	return params_bson_array << finalize;
 }
 
-bsoncxx::document::value bson_irc_serializer::serializePrefix(const irc::prefix_t& prefix) {
-	auto prefixDocument = document{};
+bsoncxx::document::value bson_irc_serializer::serialize_prefix(const irc::prefix_t& prefix) {
+	auto prefix_document = document{};
 
-	prefixDocument << "main" << prefix.main();
+	prefix_document << "main" << prefix.main();
 	if (prefix.user().has_value())
-		prefixDocument << "user" << prefix.user().value();
+		prefix_document << "user" << prefix.user().value();
 	if (prefix.host().has_value())
-		prefixDocument << "host" << prefix.host().value();
+		prefix_document << "host" << prefix.host().value();
 
-	return prefixDocument << finalize;
+	return prefix_document << finalize;
 }
 
-bsoncxx::document::value bson_irc_serializer::serializeMessage(const irc::message& message) {
-	auto messageBson = document{};
+bsoncxx::document::value bson_irc_serializer::serialize_message(const irc::message& message) {
+	auto message_bson = document{};
 
-	messageBson << "command" << message.command();
+	message_bson << "command" << message.command();
 	if (!message.params().empty())
-		messageBson << "params" << serializeParams(message.params());
+		message_bson << "params" << serialize_params(message.params());
 	if (!message.tags().empty())
-		messageBson << "tags" << serializeTags(message.tags());
+		message_bson << "tags" << serialize_tags(message.tags());
 	if (message.prefix().has_value()) {
-		messageBson << "prefix" << serializePrefix(message.prefix().value());
+		message_bson << "prefix" << serialize_prefix(message.prefix().value());
 	}
 
-	return messageBson << finalize;
+	return message_bson << finalize;
 }
 
 
-irc::message bson_irc_serializer::deserializeMessage(const bsoncxx::document::view_or_value& bsonMessage) {
+irc::message bson_irc_serializer::deserialize_message(const bsoncxx::document::view_or_value& bson_message) {
 	irc::tags_t tags;
 	std::optional<irc::prefix_t> prefix;
 	std::string command;
 	std::vector<std::string> params;
 
 	try {
-		for (const bsoncxx::document::element& el : bsonMessage.view()) {
+		for (const bsoncxx::document::element& el : bson_message.view()) {
 			if (el.key() == "command")
 				command = el.get_utf8().value;
 			else if (el.key() == "params")
-				params = deserializeParams(el.get_array());
+				params = deserialize_params(el.get_array());
 			else if (el.key() == "tags")
-				tags = deserializeTags(el.get_array());
+				tags = deserialize_tags(el.get_array());
 			else if (el.key() == "prefix")
-				prefix = deserializePrefix(el.get_document().view());
+				prefix = deserialize_prefix(el.get_document().view());
 			else {
-				// TODO throw
+				throw deserialization_exception();
 			}
 		}
 	} catch (const bsoncxx::exception& e) {
-		// TODO throw
+		throw deserialization_exception();
 	}
 
 	if (command.empty()) {
-		// TODO throw
+		throw deserialization_exception();
 	}
 
 	return irc::message(tags, prefix, command, params);
 }
 
-irc::tags_t bson_irc_serializer::deserializeTags(const bsoncxx::array::view& bsonTags) {
+irc::tags_t bson_irc_serializer::deserialize_tags(const bsoncxx::array::view& bson_tags) {
 	irc::tags_t tags;
 
 	try {
-		for (const bsoncxx::array::element& el : bsonTags) {
+		for (const bsoncxx::array::element& el : bson_tags) {
 			if (el.type() == bsoncxx::types::b_document::type_id) {
 				bsoncxx::document::view doc = el.get_document().view();
 				if (doc.length() != 1) {
-					// TODO throw
+					throw deserialization_exception();
 				}
 				tags.emplace(doc.begin()->key(), doc.begin()->get_utf8().value);
 			} else {
@@ -113,32 +114,32 @@ irc::tags_t bson_irc_serializer::deserializeTags(const bsoncxx::array::view& bso
 			}
 		}
 	} catch (const bsoncxx::exception& e) {
-		// TODO throw
+		throw deserialization_exception();
 	}
 
 	return tags;
 }
 
-std::vector<std::string> bson_irc_serializer::deserializeParams(const bsoncxx::array::view& bsonParams) {
+std::vector<std::string> bson_irc_serializer::deserialize_params(const bsoncxx::array::view& bson_params) {
 	std::vector<std::string> params;
 
 	try {
-		for (const bsoncxx::array::element& el : bsonParams) {
+		for (const bsoncxx::array::element& el : bson_params) {
 			params.emplace_back(el.get_utf8().value);
 		}
 	} catch (const bsoncxx::exception& e) {
-		// TODO throw
+		throw deserialization_exception();
 	}
 
 	return params;
 }
 
-irc::prefix_t bson_irc_serializer::deserializePrefix(const bsoncxx::document::view_or_value& bsonPrefix) {
+irc::prefix_t bson_irc_serializer::deserialize_prefix(const bsoncxx::document::view_or_value& bson_prefix) {
 	std::string main;
 	std::optional<std::string> user, host;
 
 	try {
-		for (const bsoncxx::document::element& el : bsonPrefix.view()) {
+		for (const bsoncxx::document::element& el : bson_prefix.view()) {
 			if (el.key() == "main") {
 				main = el.get_utf8().value;
 			} else if (el.key() == "user") {
@@ -146,15 +147,31 @@ irc::prefix_t bson_irc_serializer::deserializePrefix(const bsoncxx::document::vi
 			} else if (el.key() == "host") {
 				host = el.get_utf8().value;
 			} else {
-				// TODO throw
+				throw deserialization_exception();
 			}
 		}
 	} catch (const bsoncxx::exception& e) {
-		// TODO throw
+		throw deserialization_exception();
 	}
 	if (main.empty()) {
-		// TODO throw
+		throw deserialization_exception();
 	}
 
 	return irc::prefix_t(main, user, host);
+}
+
+bsoncxx::document::value bson_irc_serializer::serialize_query(const std::string& query) {
+	try {
+		return bsoncxx::from_json(query);
+	} catch (const bsoncxx::exception& e) {
+		throw query_serialization_exception();
+	}
+}
+
+const char* bson_irc_serializer::deserialization_exception::what() const noexcept {
+	return "Problem with deserialization";
+}
+
+const char* bson_irc_serializer::query_serialization_exception::what() const noexcept {
+	return "Problem with converting query to bson";
 }

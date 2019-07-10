@@ -14,11 +14,15 @@ class mongodb_communicator : public db_communicator {
   public:
 	mongodb_communicator(const std::string& host, uint16_t port, const std::string& username, const std::string& auth);
 
-	bool saveMessage(const irc::message& message) override;
+	bool save_message(const irc::message& message) override;
 
-	std::vector<irc::message> loadMessages(const std::string& querry) override;
+	std::vector<irc::message> load_messages(const std::string& query) override;
+
+	std::vector<irc::message> load_messages(const bsoncxx::document::view_or_value& query);
   private:
 	mongocxx::client m_client;
+
+	mongocxx::collection m_messages_collection;
 };
 
 

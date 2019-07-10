@@ -9,12 +9,19 @@
 
 class db_communicator {
   public:
-	virtual bool saveMessage(const irc::message& message) = 0;
+	virtual bool save_message(const irc::message& message) = 0;
 
-	virtual std::vector<irc::message> loadMessages(const std::string& querry) = 0;
+	virtual std::vector<irc::message> load_messages(const std::string& query) = 0;
+
+	class invalid_query : public std::exception {
+	  public:
+		const char* what() const noexcept override {
+			return "Invalid query";
+		}
+	};
 
   protected:
-	db_communicator( const std::string& host, uint16_t port, const std::string& username, const std::string auth ){};
+	db_communicator() = default;
 };
 
 
