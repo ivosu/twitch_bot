@@ -235,7 +235,7 @@ namespace irc_parsing {
 			if (it == end)
 				throw message::parsing_error("Message ended while parsing prefix");
 			while (*it != ' ') { // Parse host part
-				host.push_back(*it++);
+				host.push_back(*it++); // TODO validate for valid host by rfc952
 				if (it == end)
 					throw message::parsing_error("Message ended while parsing prefix");
 			}
