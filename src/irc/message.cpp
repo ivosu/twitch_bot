@@ -395,6 +395,15 @@ message& message::capability_request_end_message() {
 	return message;
 }
 
+bool irc::message::operator==(const message& other) const {
+	return m_command == other.m_command && m_prefix == other.m_prefix && m_params == other.m_params &&
+		   m_tags == other.m_tags;
+}
+
+bool irc::message::operator!=(const message& other) const {
+	return !operator==(other);
+}
+
 string prefix_t::to_irc_prefix() const {
 	string prefix = m_main;
 	if (m_user.has_value())
@@ -402,4 +411,12 @@ string prefix_t::to_irc_prefix() const {
 	if (m_host.has_value())
 		prefix += "@" + m_host.value();
 	return prefix;
+}
+
+bool irc::prefix_t::operator==(const prefix_t& other) const {
+	return m_main == other.m_main && m_user == other.m_user && m_host == other.m_host;
+}
+
+bool irc::prefix_t::operator!=(const prefix_t& other) const {
+	return !operator==(other);
 }

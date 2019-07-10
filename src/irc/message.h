@@ -27,6 +27,10 @@ namespace irc {
 
 		std::string to_irc_prefix() const;
 
+		bool operator==(const prefix_t& other) const;
+
+		bool operator!=(const prefix_t& other) const;
+
 	  private:
 		std::string m_main;
 		std::optional<std::string> m_user;
