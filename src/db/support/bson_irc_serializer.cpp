@@ -105,7 +105,7 @@ irc::tags_t bson_irc_serializer::deserialize_tags(const bsoncxx::array::view& bs
 		for (const bsoncxx::array::element& el : bson_tags) {
 			if (el.type() == bsoncxx::types::b_document::type_id) {
 				bsoncxx::document::view doc = el.get_document().view();
-				if (doc.length() != 1) {
+				if (std::distance(doc.begin(), doc.end()) != 1) {
 					throw deserialization_exception();
 				}
 				tags.emplace(doc.begin()->key(), doc.begin()->get_utf8().value);

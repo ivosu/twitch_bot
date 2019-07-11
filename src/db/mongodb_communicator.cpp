@@ -14,11 +14,15 @@
 
 bool mongodb_communicator::save_message(const irc::message& message) {
 	bsoncxx::document::value message_bson = bson_irc_serializer::serialize_message(message);
-	irc::message deserialized_message = bson_irc_serializer::deserialize_message(message_bson.view());
-	if (deserialized_message != message) {
-		std::cerr << "Deserialized message differs from original message" << std::endl << message.to_irc_message()
-				  << std::endl << bsoncxx::to_json(message_bson) << std::endl << deserialized_message.to_irc_message()
-				  << std::endl << std::endl;
+	try {
+		irc::message deserialized_message = bson_irc_serializer::deserialize_message(message_bson.view());
+		if (deserialized_message != message) {
+			std::cerr << "Deserialized message differs from original message" << std::endl << message.to_irc_message()
+					  << std::endl << bsoncxx::to_json(message_bson) << std::endl << deserialized_message.to_irc_message()
+					  << std::endl << std::endl;
+		}
+	} catch (const bson_irc_serializer::deserialization_exception& e) {
+		std::cout << bsoncxx::to_json(message_bson) << std::endl;
 	}
 	try {
 		auto result = m_messages_collection.insert_one(message_bson.view());
