@@ -1,7 +1,3 @@
-//
-// Created by strejivo on 3/24/19.
-//
-
 #ifndef TWITCH_IRC_IRCCLIENT_H
 #define TWITCH_IRC_IRCCLIENT_H
 
@@ -10,7 +6,7 @@
 #include <cpprest/ws_client.h>
 #include <thread>
 #include "message.h"
-#include "../tst_queue.hpp"
+#include "../utils/ts_queue.hpp"
 
 namespace irc {
 	class irc_client {
@@ -32,7 +28,7 @@ namespace irc {
 
 		const bool m_handle_ping;
 
-		tst_queue<message> m_queued_messages;
+		ts_queue<message> m_queued_messages;
 
 		web::websockets::client::websocket_client m_client;
 

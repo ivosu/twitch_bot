@@ -1,7 +1,3 @@
-//
-// Created by strejivo on 7/8/19.
-//
-
 #include "bson_irc_serializer.h"
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
@@ -14,6 +10,15 @@ using bsoncxx::builder::stream::array;
 using bsoncxx::builder::stream::open_document;
 using bsoncxx::builder::stream::close_document;
 using bsoncxx::builder::stream::finalize;
+
+#define BSON_IRC_MESSAGE_COMMAND "command"
+#define BSON_IRC_MESSAGE_PARAMS "params"
+#define BSON_IRC_MESSAGE_PREFIX "prefix"
+#define BSON_IRC_MESSAGE_TAGS "tags"
+
+#define BSON_IRC_MESSAGE_PREFIX_MAIN "main"
+#define BSON_IRC_MESSAGE_PREFIX_HOST "host"
+#define BSON_IRC_MESSAGE_PREFIX_USER "user"
 
 bsoncxx::array::value bson_irc_serializer::serialize_tags(const irc::tags_t& tags) {
 	auto tags_bson_array = array{};
@@ -42,11 +47,11 @@ bsoncxx::array::value bson_irc_serializer::serialize_params(const std::vector<st
 bsoncxx::document::value bson_irc_serializer::serialize_prefix(const irc::prefix_t& prefix) {
 	auto prefix_document = document{};
 
-	prefix_document << "main" << prefix.main();
+	prefix_document << BSON_IRC_MESSAGE_PREFIX_MAIN << prefix.main();
 	if (prefix.user().has_value())
-		prefix_document << "user" << prefix.user().value();
+		prefix_document << BSON_IRC_MESSAGE_PREFIX_USER << prefix.user().value();
 	if (prefix.host().has_value())
-		prefix_document << "host" << prefix.host().value();
+		prefix_document << BSON_IRC_MESSAGE_PREFIX_HOST << prefix.host().value();
 
 	return prefix_document << finalize;
 }
@@ -54,13 +59,13 @@ bsoncxx::document::value bson_irc_serializer::serialize_prefix(const irc::prefix
 bsoncxx::document::value bson_irc_serializer::serialize_message(const irc::message& message) {
 	auto message_bson = document{};
 
-	message_bson << "command" << message.command();
+	message_bson << BSON_IRC_MESSAGE_COMMAND << message.command();
 	if (!message.params().empty())
-		message_bson << "params" << serialize_params(message.params());
+		message_bson << BSON_IRC_MESSAGE_PARAMS << serialize_params(message.params());
 	if (!message.tags().empty())
-		message_bson << "tags" << serialize_tags(message.tags());
+		message_bson << BSON_IRC_MESSAGE_TAGS << serialize_tags(message.tags());
 	if (message.prefix().has_value()) {
-		message_bson << "prefix" << serialize_prefix(message.prefix().value());
+		message_bson << BSON_IRC_MESSAGE_PREFIX << serialize_prefix(message.prefix().value());
 	}
 
 	return message_bson << finalize;
@@ -75,13 +80,13 @@ irc::message bson_irc_serializer::deserialize_message(const bsoncxx::document::v
 
 	try {
 		for (const bsoncxx::document::element& el : bson_message.view()) {
-			if (el.key() == "command")
+			if (el.key() == BSON_IRC_MESSAGE_COMMAND)
 				command = el.get_utf8().value;
-			else if (el.key() == "params")
+			else if (el.key() == BSON_IRC_MESSAGE_PARAMS)
 				params = deserialize_params(el.get_array());
-			else if (el.key() == "tags")
+			else if (el.key() == BSON_IRC_MESSAGE_TAGS)
 				tags = deserialize_tags(el.get_array());
-			else if (el.key() == "prefix")
+			else if (el.key() == BSON_IRC_MESSAGE_PREFIX)
 				prefix = deserialize_prefix(el.get_document().view());
 			else {
 				throw deserialization_exception();
@@ -140,11 +145,11 @@ irc::prefix_t bson_irc_serializer::deserialize_prefix(const bsoncxx::document::v
 
 	try {
 		for (const bsoncxx::document::element& el : bson_prefix.view()) {
-			if (el.key() == "main") {
+			if (el.key() == BSON_IRC_MESSAGE_PREFIX_MAIN) {
 				main = el.get_utf8().value;
-			} else if (el.key() == "user") {
+			} else if (el.key() == BSON_IRC_MESSAGE_PREFIX_USER) {
 				user = el.get_utf8().value;
-			} else if (el.key() == "host") {
+			} else if (el.key() == BSON_IRC_MESSAGE_PREFIX_HOST) {
 				host = el.get_utf8().value;
 			} else {
 				throw deserialization_exception();

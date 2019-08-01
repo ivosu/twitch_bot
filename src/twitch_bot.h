@@ -1,7 +1,3 @@
-//
-// Created by strejivo on 3/22/19.
-//
-
 #ifndef TWITCH_IRC_TWITCHBOT_H
 #define TWITCH_IRC_TWITCHBOT_H
 

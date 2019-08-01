@@ -1,7 +1,3 @@
-//
-// Created by strejivo on 3/22/19.
-//
-
 #include "twitch_bot.h"
 
 using std::string;

@@ -1,13 +1,9 @@
-//
-// Created by strejivo on 7/3/19.
-//
-
-#ifndef TWITCH_IRC_DB_COMMUNICATOR_H
-#define TWITCH_IRC_DB_COMMUNICATOR_H
+#ifndef TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H
+#define TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H
 
 #include "../irc/message.h"
 
-class db_communicator {
+class db_message_communicator {
   public:
 	virtual bool save_message(const irc::message& message) = 0;
 
@@ -21,8 +17,8 @@ class db_communicator {
 	};
 
   protected:
-	db_communicator() = default;
+	db_message_communicator() = default;
 };
 
 
-#endif //TWITCH_IRC_DB_COMMUNICATOR_H
+#endif //TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H

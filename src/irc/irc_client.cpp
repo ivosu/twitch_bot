@@ -1,7 +1,3 @@
-//
-// Created by strejivo on 3/24/19.
-//
-
 #include "irc_client.h"
 
 using std::string;

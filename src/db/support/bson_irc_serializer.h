@@ -1,7 +1,3 @@
-//
-// Created by strejivo on 7/8/19.
-//
-
 #ifndef TWITCH_IRC_BSON_IRC_SERIALIZER_H
 #define TWITCH_IRC_BSON_IRC_SERIALIZER_H
 

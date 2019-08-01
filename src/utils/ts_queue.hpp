@@ -1,17 +1,17 @@
-//
-// Created by strejivo on 3/29/19.
-//
-
-#ifndef TWITCH_IRC_TST_QUEUE_HPP
-#define TWITCH_IRC_TST_QUEUE_HPP
+#ifndef TWITCH_IRC_TS_QUEUE_HPP
+#define TWITCH_IRC_TS_QUEUE_HPP
 
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <optional>
 
+/**
+ * Simple thread safe queue
+ * @tparam T of what type the queue is
+ */
 template<typename T>
-class tst_queue {
+class ts_queue {
   public:
 
 	void push(T&& val) {
@@ -65,4 +65,4 @@ class tst_queue {
 	std::condition_variable m_cond_var;
 };
 
-#endif //TWITCH_IRC_TST_QUEUE_HPP
+#endif //TWITCH_IRC_TS_QUEUE_HPP

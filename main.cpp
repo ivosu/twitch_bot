@@ -1,8 +1,13 @@
 #include <iostream>
 #include <libconfig.h++>
+#include <mongocxx/instance.hpp>
 #include "src/twitch_bot.h"
+#include "src/db/mongodb_communicator.h"
+#include "src/utils/temporary_file.hpp"
 
 int main() {
+	mongocxx::instance instance{};
+
 	libconfig::Config conf;
 	try {
 		conf.readFile("config");
@@ -20,7 +25,7 @@ int main() {
 		return 1;
 	}
 
-	std::vector<std::string> channels = {"ivosu", "fattypillow"};
+	std::vector<std::string> channels = {"ivosu", "agraelus"};
 
 	bot.cap_req({"twitch.tv/commands", "twitch.tv/tags"});
 
@@ -37,8 +42,10 @@ int main() {
 	}
 
 	std::cerr << "Chat connected" << std::endl;
+	mongodb_communicator com("localhost", 27017, "", "");
 	while (true) {
 		irc::message tmp = bot.read_message();
+		com.save_message(tmp);
 		if (tmp.command() == "PRIVMSG") {
 			std::string sender = twitch_bot::get_user_name_private_message(tmp);
 			std::string message = *tmp.params().rbegin();
@@ -48,33 +55,6 @@ int main() {
 				break;
 			else if (message.find("ivosu") != std::string::npos || message.find("Ivosu") != std::string::npos) {
 				std::cout << sender << "@" << channel << ": " << message << std::endl;
-			}
-		} else {
-			std::cout << tmp.to_irc_message();
-			if (tmp.command() == "USERNOTICE") {
-				std::string channel = tmp.params().front();
-				channel.erase(channel.begin());
-				if (channel == "fattypillow") {
-					auto tags = tmp.tags();
-					auto msg_id_it = tags.find("msg-id");
-					if (msg_id_it == tags.cend() || !msg_id_it->second.has_value())
-						continue;
-					const std::string& msg_id = msg_id_it->second.value();
-					if (msg_id == "sub" || msg_id == "resub") {
-						std::string user = twitch_bot::get_user_name_from_user_notice_tags(tags);
-						bot.send_message(
-								"fattySub fattySub fattySub Vítej " + std::string(msg_id == "resub" ? "zpátky " : "") +
-								user +
-								" do naší tučné rodiny fattySub fattySub fattySub", channel);
-					} else if (msg_id == "subgift" || msg_id == "anonsubgift") {
-						std::string gifter = twitch_bot::get_user_name_from_user_notice_tags(tags);
-						std::string gifted = twitch_bot::get_gifted_recipient_user_name(tags);
-						bot.send_message(
-								"fattySub fattySub fattySub Vítej " + gifted +
-								" do naší tučné rodiny fattySub fattySub fattySub",
-								channel);
-					}
-				}
 			}
 		}
 	}
