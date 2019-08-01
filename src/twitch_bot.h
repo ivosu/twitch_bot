@@ -5,6 +5,7 @@
 #include "irc/irc_client.h"
 #include <string>
 #include <set>
+#include <list>
 
 class twitch_bot {
   public:
