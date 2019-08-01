@@ -46,7 +46,9 @@ int main() {
 	mongodb_communicator com(mongodb_libconfig(conf.lookup("mongodb")));
 	while (true) {
 		irc::message tmp = bot.read_message();
-		com.save_message(tmp);
+		if (!com.save_message(tmp)) {
+			std::cerr<<"failed to save message"<<std::endl;
+		}
 		if (tmp.command() == "PRIVMSG") {
 			std::string sender = twitch_bot::get_user_name_private_message(tmp);
 			std::string message = *tmp.params().rbegin();
