@@ -1,6 +1,6 @@
 #include "mongodb_communicator.h"
-#include "support/bson_irc_serializer.h"
-#include "support/bson_handler_serializer.h"
+#include "support/serialization/bson_irc_serializer.h"
+#include "support/serialization/bson_handler_serializer.h"
 #include <mongocxx/exception/bulk_write_exception.hpp>
 #include <mongocxx/exception/logic_error.hpp>
 #include <mongocxx/exception/query_exception.hpp>
@@ -38,22 +38,21 @@ std::vector<irc::message> mongodb_communicator::load_messages(const std::string&
 	}
 }
 
-mongodb_communicator::mongodb_communicator(const std::string& host, uint16_t port, const std::string& username,
-										   const std::string& auth) {
-	std::string userinfo = username;
-	if (!auth.empty()) {
-		userinfo += ":" + auth;
+mongodb_communicator::mongodb_communicator(const config& config) {
+	std::string userinfo = config.username();
+	if (!config.auth().empty()) {
+		userinfo += ":" + config.auth();
 	}
 	std::string uri_str = "mongodb://";
 	if (!userinfo.empty()) {
 		uri_str += userinfo + "@";
 	}
-	uri_str += host + ":" + std::to_string(port);
+	uri_str += config.host() + ":" + std::to_string(config.port());
 	mongocxx::uri uri{uri_str};
 
 	m_client = mongocxx::client(uri);
-	m_messages_collection = m_client["twitch_bot"]["messages"];
-	m_handlers_collection = m_client["twitch_bot"]["handlers"];
+	m_messages_collection = m_client[config.db()]["messages"];
+	m_handlers_collection = m_client[config.db()]["handlers"];
 }
 
 std::vector<irc::message> mongodb_communicator::load_messages(const bsoncxx::document::view_or_value& query) {

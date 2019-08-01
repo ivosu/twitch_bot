@@ -68,8 +68,9 @@ bson_handler_serializer::deserialize_python_handler(const bsoncxx::document::vie
 	bool channel_set = false;
 	bool handled_event_type_set = false;
 	bool handle_code_set = false;
+	#ifdef DEBUG
 	bool handler_type_set = false;
-
+	#endif //DEBUG
 	try {
 		for (const bsoncxx::document::element& el : serialized_handler) {
 			if (el.key() == BSON_CHANNEL) {
@@ -81,8 +82,8 @@ bson_handler_serializer::deserialize_python_handler(const bsoncxx::document::vie
 			} else if (el.key() == BSON_HANDLER_TYPE) {
 				#ifdef DEBUG
 				// TODO assert že je handle type fakt python
-				#endif //DEBUG
 				handler_type_set = true;
+				#endif //DEBUG
 			} else if (el.key() == BSON_HANDLE_CODE) {
 				handle_code = el.get_utf8().value;
 				handle_code_set = true;
@@ -96,7 +97,9 @@ bson_handler_serializer::deserialize_python_handler(const bsoncxx::document::vie
 	if (!channel_set || !handled_event_type_set || !handle_code_set) {
 		throw deserialization_exception();
 	}
-	// TODO assert type set
+	#ifdef DEBUG
+	// TODO assert handler_type_set
+	#endif //DEBUG
 	return std::make_pair(
 			std::make_shared<python_event_handler>(handled_event_type, handle_code),
 			channel);

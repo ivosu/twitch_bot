@@ -1,8 +1,8 @@
 #ifndef TWITCH_IRC_BSON_HANDLER_SERIALIZER_H
 #define TWITCH_IRC_BSON_HANDLER_SERIALIZER_H
 
-#include "../../handlers/event_handler.h"
-#include "../../handlers/python_event_handler.h"
+#include "../../../handlers/event_handler.h"
+#include "../../../handlers/python_event_handler.h"
 #include <bsoncxx/document/value.hpp>
 
 class bson_handler_serializer {

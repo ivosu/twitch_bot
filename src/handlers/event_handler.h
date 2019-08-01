@@ -9,15 +9,11 @@ class event_handler {
 	enum event_type {
 		message, subscription, room_state
 	};
-	static const std::string& event_type_to_string (event_type){}
-	static event_type event_type_from_string(const std::string& even_type_str){}
 
 	enum handler_type {
 		cpp, python
 
 	};
-	static const std::string& handler_type_to_string(handler_type){}
-	static handler_type handler_type_from_string(const std::string& handler_type_str){}
 
 	struct handle_arguments {
 		const irc::message& event;

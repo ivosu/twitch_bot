@@ -4,6 +4,7 @@
 #include "src/twitch_bot.h"
 #include "src/db/mongodb_communicator.h"
 #include "src/utils/temporary_file.hpp"
+#include "src/db/support/configuration/mongodb_libconfig.h"
 
 int main() {
 	mongocxx::instance instance{};
@@ -17,7 +18,7 @@ int main() {
 		std::cerr << e.getError() << " on line " << e.getLine() << std::endl;
 	}
 	twitch_bot bot;
-	libconfig::Setting& login = conf.lookup("login");
+	libconfig::Setting& login = conf.lookup("twitch.login");
 	std::string username;
 	std::string auth;
 	if (!login.lookupValue("username", username) || !login.lookupValue("auth", auth)) {
@@ -42,7 +43,7 @@ int main() {
 	}
 
 	std::cerr << "Chat connected" << std::endl;
-	mongodb_communicator com("localhost", 27017, "", "");
+	mongodb_communicator com(mongodb_libconfig(conf.lookup("mongodb")));
 	while (true) {
 		irc::message tmp = bot.read_message();
 		com.save_message(tmp);
@@ -53,9 +54,7 @@ int main() {
 			channel.erase(channel.begin());
 			if ((sender == "Ivosu" || sender == "ivosu") && message == "!stop")
 				break;
-			else if (message.find("ivosu") != std::string::npos || message.find("Ivosu") != std::string::npos) {
-				std::cout << sender << "@" << channel << ": " << message << std::endl;
-			}
+			std::cout << sender << "@" << channel << ": " << message << std::endl;
 		}
 	}
 	return 0;

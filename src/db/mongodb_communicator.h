@@ -9,7 +9,23 @@
 
 class mongodb_communicator : public db_message_communicator, public db_handler_communicator {
   public:
-	mongodb_communicator(const std::string& host, uint16_t port, const std::string& username, const std::string& auth);
+	class config {
+	  public:
+		virtual const std::string& host() const = 0;
+
+		virtual uint16_t port() const = 0;
+
+		virtual const std::string& username() const = 0;
+
+		virtual const std::string& auth() const = 0;
+
+		virtual const std::string& db() const = 0;
+
+	  protected:
+		config() = default;
+	};
+
+	mongodb_communicator(const config& config);
 
 	bool save_message(const irc::message& message) override;
 
