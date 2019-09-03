@@ -3,7 +3,7 @@
 
 #include <bsoncxx/array/value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
-#include "../../../irc/message.h"
+#include "irc/message.h"
 
 class bson_irc_serializer {
   public:

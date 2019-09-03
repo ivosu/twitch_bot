@@ -1,7 +1,7 @@
 #ifndef TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H
 #define TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H
 
-#include "../irc/message.h"
+#include "irc/message.h"
 
 class db_message_communicator {
   public:

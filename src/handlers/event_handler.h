@@ -2,7 +2,7 @@
 #define TWITCH_IRC_EVENT_HANDLER_H
 
 
-#include "../irc/message.h"
+#include "irc/message.h"
 
 class event_handler {
   public:
