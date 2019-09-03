@@ -5,4 +5,4 @@
 
 [submodule "ircpp"]
 	path = ircpp
-	url = git@github.com:Ivosu/ircpp.git
+	url = git@github.com:ivosu/ircpp.git

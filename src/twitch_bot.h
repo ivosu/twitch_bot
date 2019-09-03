@@ -2,7 +2,7 @@
 #define TWITCH_IRC_TWITCHBOT_H
 
 #include "irc/message.h"
-#include "irc/irc_client.h"
+#include "irc/client.h"
 #include <string>
 #include <set>
 #include <list>
@@ -40,7 +40,7 @@ class twitch_bot {
 	static std::string get_gifted_recipient_user_name(const irc::tags_t& tags);
 
   private:
-	irc::irc_client m_irc_client;
+	irc::client m_irc_client;
 	std::string m_nickname;
 	bool m_logged_in = false;
 	std::set<std::string> m_joined_channels;
