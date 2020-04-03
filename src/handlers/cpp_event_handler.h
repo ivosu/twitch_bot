@@ -9,9 +9,10 @@ class cpp_event_handler : public event_handler {
 
   public:
 	cpp_event_handler(event_type handled_event, handle_function handler) :
-			event_handler(handled_event, cpp), m_handler(std::move(handler)) {}
+	  event_handler(handled_event, cpp), m_handler(std::move(handler)) {}
 
 	void handle(const handle_arguments& args) final { m_handler(args); }
+
   private:
 	handle_function m_handler;
 };

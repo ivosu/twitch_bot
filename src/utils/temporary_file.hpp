@@ -6,7 +6,6 @@
 
 /**
  * Simple implementation of temporary file
- * Uses tmpnam, in future would be great to switch to something like mkstemp
  */
 class temporary_file : public std::fstream {
   public:
