@@ -2,7 +2,7 @@
 #define TWITCH_IRC_DB_HANDLER_COMMUNICATOR_H
 
 #include <string>
-#include "../handlers/event_handler.h"
+#include "../handling/handlers/event_handler.h"
 
 class db_handler_communicator {
   public:

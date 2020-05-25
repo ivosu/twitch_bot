@@ -2,6 +2,8 @@
 #define TWITCH_IRC_EVENT_HANDLER_H
 
 
+#include <variant>
+
 #include "irc/message.h"
 
 class event_handler {

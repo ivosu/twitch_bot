@@ -22,6 +22,7 @@ add_executable(
         src/utils/temporary_file.hpp
         src/db/support/serialization/bson_handler_serializer.cpp
         src/db/support/configuration/mongodb_libconfig.cpp
+        src/handling/events.h
     )
 
 include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
