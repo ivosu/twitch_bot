@@ -13,6 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pedantic -Wextra -Wall -pthread")
 
+set (PYBIND11_PYTHON_VERSION "3.9")
+
 add_executable(
     twitch_bot
         main.cpp
