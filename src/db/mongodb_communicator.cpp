@@ -7,6 +7,7 @@
 #include <bsoncxx/types.hpp>
 #include <iostream>
 #include <bsoncxx/json.hpp>
+#include <assert.h>
 
 
 bool mongodb_communicator::save_message(const irc::message& message) {
@@ -87,22 +88,50 @@ bool mongodb_communicator::save_or_update_handler(const event_handler& handler, 
 		return false;
 	}
 
-	bsoncxx::document::view_or_value queue = bson_handler_serializer::get_query(channel, handler.get_handled_event_type());
-	//m_handlers_collection.update
-
-	try {
-		auto result = m_handlers_collection.insert_one(serialized_handler);
-	} catch (const mongocxx::bulk_write_exception& e) {
-		return false;
+	bsoncxx::document::view_or_value query = bson_handler_serializer::get_query(channel, handler.get_handled_event_type());
+	auto maybe_result = m_handlers_collection.find_one(query);
+	if (maybe_result) {
+		try {
+			m_handlers_collection.update_one(query, serialized_handler);
+		} catch (const mongocxx::bulk_write_exception& e) {
+			// todo log
+			return false;
+		} catch (const mongocxx::logic_error& e){
+			// todo log
+			return false;
+		}
 	}
-	return true;
+	else {
+		try {
+			auto result = m_handlers_collection.insert_one(serialized_handler);
+			return true;
+		} catch (const mongocxx::bulk_write_exception& e) {
+			return false;
+		}
+	}
+	return false;
 }
 
 std::vector<std::shared_ptr<event_handler>> mongodb_communicator::load_handlers(const std::string& channel) {
 	bsoncxx::document::view query = bson_handler_serializer::get_query(channel);
+	std::vector<std::shared_ptr<event_handler>> matchedHandlers;
+	mongocxx::cursor cursor = m_handlers_collection.find(query);
+	for (auto doc : cursor) {
+		matchedHandlers.push_back(bson_handler_serializer::deserialize_handler_only(doc));
+	}
+	return matchedHandlers;
 }
 
 std::shared_ptr<event_handler>
 mongodb_communicator::load_handler(const std::string& channel, event_handler::event_type event_type) {
-	return std::shared_ptr<event_handler>();
+	bsoncxx::document::view query = bson_handler_serializer::get_query(channel, event_type);
+	std::shared_ptr<event_handler> matched_handler;
+	#ifdef DEBUG
+	mongocxx::cursor cursor = m_handlers_collection.find(query);
+	// TODO redo assert
+	assert(std::distance(cursor.begin(), cursor.end()) == 1);
+	return bson_handler_serializer::deserialize_handler_only(*cursor.begin());
+	#else
+	return bson_handler_serializer::deserialize_handler_only(m_handlers_collection.find_one(query));
+	#endif // DEBUG
 }

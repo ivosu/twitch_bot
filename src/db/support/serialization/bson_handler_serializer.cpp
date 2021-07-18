@@ -105,6 +105,46 @@ bson_handler_serializer::deserialize_python_handler(const bsoncxx::document::vie
 			channel);
 }
 
+std::shared_ptr<python_event_handler>
+bson_handler_serializer::deserialize_python_handler_only(const bsoncxx::document::view& serialized_handler) {
+	event_handler::event_type handled_event_type = event_handler::event_type::message;
+	std::string handle_code;
+	bool handled_event_type_set = false;
+	bool handle_code_set = false;
+	#ifdef DEBUG
+	bool handler_type_set = false;
+	#endif //DEBUG
+	try {
+		for (const bsoncxx::document::element& el : serialized_handler) {
+			if (el.key() == BSON_CHANNEL) {
+				continue;
+			} else if (el.key() == BSON_HANDLED_EVENT_TYPE) {
+				handled_event_type = event_from_string.at(std::string(el.get_utf8().value));
+				handled_event_type_set = true;
+			} else if (el.key() == BSON_HANDLER_TYPE) {
+				#ifdef DEBUG
+				// TODO assert that handle type is really python
+				handler_type_set = true;
+				#endif //DEBUG
+			} else if (el.key() == BSON_HANDLE_CODE) {
+				handle_code = el.get_utf8().value;
+				handle_code_set = true;
+			} else {
+				throw deserialization_exception();
+			}
+		}
+	} catch (const bsoncxx::exception& e) {
+		throw deserialization_exception();
+	}
+	if (!handled_event_type_set || !handle_code_set) {
+		throw deserialization_exception();
+	}
+	#ifdef DEBUG
+	// TODO assert handler_type_set
+	#endif //DEBUG
+	return std::make_shared<python_event_handler>(handled_event_type, handle_code);
+}
+
 std::pair<std::shared_ptr<event_handler>, std::string>
 bson_handler_serializer::deserialize_handler(const bsoncxx::document::view& serialized_handler) {
 	switch (handler_type_from_string.at(std::string(serialized_handler["handler_type"].get_utf8().value))) {
@@ -115,6 +155,19 @@ bson_handler_serializer::deserialize_handler(const bsoncxx::document::view& seri
 		default:
 			// TODO assert
 			return std::make_pair(std::shared_ptr<event_handler>(), "");
+	}
+}
+
+std::shared_ptr<event_handler>
+bson_handler_serializer::deserialize_handler_only(const bsoncxx::document::view& serialized_handler) {
+	switch (handler_type_from_string.at(std::string(serialized_handler["handler_type"].get_utf8().value))) {
+		case event_handler::handler_type::python:
+			return deserialize_python_handler_only(serialized_handler);
+		case event_handler::handler_type::cpp:
+			throw unserializable_exception();
+		default:
+			// TODO assert
+			return std::shared_ptr<event_handler>();
 	}
 }
 

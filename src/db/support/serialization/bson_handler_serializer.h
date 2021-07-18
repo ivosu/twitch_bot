@@ -14,6 +14,9 @@ class bson_handler_serializer {
 	static std::pair<std::shared_ptr<event_handler>, std::string>
 	deserialize_handler(const bsoncxx::document::view& serialized_handler);
 
+	static std::shared_ptr<event_handler>
+	deserialize_handler_only(const bsoncxx::document::view& serialized_handler);
+
 	static bsoncxx::document::value get_query(const std::string& channel);
 
 	static bsoncxx::document::value get_query(const std::string& channel, event_handler::event_type event_type);
@@ -34,6 +37,9 @@ class bson_handler_serializer {
 
 	static std::pair<std::shared_ptr<python_event_handler>, std::string>
 	deserialize_python_handler(const bsoncxx::document::view& serialized_handler);
+
+	static std::shared_ptr<python_event_handler>
+	deserialize_python_handler_only(const bsoncxx::document::view& serialized_handler);
 };
 
 

@@ -12,9 +12,8 @@ class python_event_handler : public event_handler {
 
 	const std::string& get_handle_code() const { return m_handle_code; }
 
-	void handle(const event_handler::handle_arguments& args) final {
+	void handle(const event_handler::handle_arguments& args) final;
 
-	}
   private:
 	const std::string m_handle_code;
 };
