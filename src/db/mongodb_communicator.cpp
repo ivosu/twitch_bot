@@ -1,6 +1,7 @@
 #include "mongodb_communicator.h"
 #include "support/serialization/bson_irc_serializer.h"
 #include "support/serialization/bson_handler_serializer.h"
+#include "../utils/logging.hpp"
 #include <mongocxx/exception/bulk_write_exception.hpp>
 #include <mongocxx/exception/logic_error.hpp>
 #include <mongocxx/exception/query_exception.hpp>
@@ -15,11 +16,11 @@ bool mongodb_communicator::save_message(const irc::message& message) {
 	try {
 		irc::message deserialized_message = bson_irc_serializer::deserialize_message(message_bson.view());
 		if (deserialized_message != message) {
-			std::cerr << "Deserialized message differs from original message" << std::endl << message.to_irc_message()
-					  << std::endl << bsoncxx::to_json(message_bson) << std::endl
-					  << deserialized_message.to_irc_message()
-					  << std::endl << std::endl;
-		}
+			 LOG_ERROR("Deserialized message differs from original message");
+			 LOG_ERROR(message.to_irc_message());
+			 LOG_ERROR(bsoncxx::to_json(message_bson));
+			 LOG_ERROR(deserialized_message.to_irc_message());
+		 }
 	} catch (const bson_irc_serializer::deserialization_exception& e) {
 		std::cout << bsoncxx::to_json(message_bson) << std::endl;
 	}

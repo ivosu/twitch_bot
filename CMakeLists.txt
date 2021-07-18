@@ -22,6 +22,7 @@ add_executable(
         src/db/mongodb_communicator.cpp
         src/db/support/serialization/bson_irc_serializer.cpp
         src/utils/temporary_file.hpp
+        src/utils/logging.hpp
         src/db/support/serialization/bson_handler_serializer.cpp
         src/db/support/configuration/mongodb_libconfig.cpp
         src/handlers/python_event_handler.cpp
