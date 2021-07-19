@@ -6,6 +6,10 @@ find_library(CONFIG config++)
 
 find_package(LIBMONGOCXX REQUIRED)
 
+set(CURSES_NEED_WIDE TRUE)
+set(CURSES_NEED_NCURSES TRUE)
+find_package(Curses REQUIRED)
+
 add_subdirectory(pybind11)
 add_subdirectory(ircpp)
 
