@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+
 #define _LOG_ERROR(x) std::cerr << (x) << std::endl;
 
 #define DEBUG
