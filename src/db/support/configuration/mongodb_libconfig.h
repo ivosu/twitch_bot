@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_MONGODB_LIBCONFIG_H
-#define TWITCH_IRC_MONGODB_LIBCONFIG_H
+#pragma once
 
 #include "../../mongodb_communicator.h"
 #include <libconfig.h++>
@@ -25,6 +24,3 @@ class mongodb_libconfig : public mongodb_communicator::config {
 	std::string m_auth;
 	std::string m_db;
 };
-
-
-#endif //TWITCH_IRC_MONGODB_LIBCONFIG_H

@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H
-#define TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H
+#pragma once
 
 #include "irc/message.h"
 
@@ -19,6 +18,3 @@ class db_message_communicator {
   protected:
 	db_message_communicator() = default;
 };
-
-
-#endif //TWITCH_IRC_DB_MESSAGE_COMMUNICATOR_H

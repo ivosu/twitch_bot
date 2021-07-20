@@ -1,6 +1,4 @@
-#ifndef TWITCH_IRC_EVENT_HANDLER_H
-#define TWITCH_IRC_EVENT_HANDLER_H
-
+#pragma once
 
 #include "irc/message.h"
 
@@ -32,6 +30,3 @@ class event_handler {
 	const event_type m_event_type;
 	const handler_type m_handler_type;
 };
-
-
-#endif //TWITCH_IRC_EVENT_HANDLER_H

@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_TEMPORARY_FILE_HPP
-#define TWITCH_IRC_TEMPORARY_FILE_HPP
+#pragma once
 
 #include <fstream>
 #include <filesystem>
@@ -23,5 +22,3 @@ class temporary_file : public std::fstream {
   private:
 	const std::string m_file_name;
 };
-
-#endif //TWITCH_IRC_TEMPORARY_FILE_HPP

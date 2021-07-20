@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_DB_HANDLER_COMMUNICATOR_H
-#define TWITCH_IRC_DB_HANDLER_COMMUNICATOR_H
+#pragma once
 
 #include <string>
 #include "../handlers/event_handler.h"
@@ -16,6 +15,3 @@ class db_handler_communicator {
   protected:
 	db_handler_communicator() = default;
 };
-
-
-#endif //TWITCH_IRC_DB_HANDLER_COMMUNICATOR_H

@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_CPP_EVENT_HANDLER_H
-#define TWITCH_IRC_CPP_EVENT_HANDLER_H
+#pragma once
 
 #include <functional>
 #include "event_handler.h"
@@ -16,5 +15,3 @@ class cpp_event_handler : public event_handler {
   private:
 	handle_function m_handler;
 };
-
-#endif //TWITCH_IRC_CPP_EVENT_HANDLER_H

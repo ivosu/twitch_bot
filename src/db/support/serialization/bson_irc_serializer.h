@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_BSON_IRC_SERIALIZER_H
-#define TWITCH_IRC_BSON_IRC_SERIALIZER_H
+#pragma once
 
 #include <bsoncxx/array/value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
@@ -37,6 +36,3 @@ class bson_irc_serializer {
 
 	static irc::prefix_t deserialize_prefix(const bsoncxx::document::view_or_value& bson_prefix);
 };
-
-
-#endif //TWITCH_IRC_BSON_IRC_SERIALIZER_H

@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_BSON_HANDLER_SERIALIZER_H
-#define TWITCH_IRC_BSON_HANDLER_SERIALIZER_H
+#pragma once
 
 #include "../../../handlers/event_handler.h"
 #include "../../../handlers/python_event_handler.h"
@@ -41,6 +40,3 @@ class bson_handler_serializer {
 	static std::shared_ptr<python_event_handler>
 	deserialize_python_handler_only(const bsoncxx::document::view& serialized_handler);
 };
-
-
-#endif //TWITCH_IRC_BSON_HANDLER_SERIALIZER_H

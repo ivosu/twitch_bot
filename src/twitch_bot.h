@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_TWITCHBOT_H
-#define TWITCH_IRC_TWITCHBOT_H
+#pragma once
 
 #include "irc/message.h"
 #include "irc/client.h"
@@ -46,5 +45,3 @@ class twitch_bot {
 	std::set<std::string> m_joined_channels;
 	std::list<irc::message> m_handle_later_messages;
 };
-
-#endif //TWITCH_IRC_TWITCHBOT_H

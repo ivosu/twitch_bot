@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_MONGODB_COMMUNICATOR_H
-#define TWITCH_IRC_MONGODB_COMMUNICATOR_H
+#pragma once
 
 #include "db_message_communicator.h"
 #include "mongocxx/client.hpp"
@@ -46,6 +45,3 @@ class mongodb_communicator : public db_message_communicator, public db_handler_c
 
 	mongocxx::collection m_handlers_collection;
 };
-
-
-#endif //TWITCH_IRC_MONGODB_COMMUNICATOR_H

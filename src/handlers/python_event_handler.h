@@ -1,5 +1,4 @@
-#ifndef TWITCH_IRC_PYTHON_EVENT_HANDLER_H
-#define TWITCH_IRC_PYTHON_EVENT_HANDLER_H
+#pragma once
 
 #include "event_handler.h"
 
@@ -17,5 +16,3 @@ class python_event_handler : public event_handler {
   private:
 	const std::string m_handle_code;
 };
-
-#endif //TWITCH_IRC_PYTHON_EVENT_HANDLER_H

@@ -1,5 +1,4 @@
-#ifndef TWITCH_BOT_LOGGING_HPP
-#define TWITCH_BOT_LOGGING_HPP
+#pragma once
 
 #include <iostream>
 #define _LOG_ERROR(x) std::cerr << (x) << std::endl;
@@ -11,5 +10,3 @@
 #else
 #define LOG_ERROR(x) do {} while(0)
 #endif
-
-#endif //TWITCH_BOT_LOGGING_HPP
