@@ -27,8 +27,6 @@ public:
 
     bool join_channel(const std::string& channel);
 
-    void on_command(const irc::message& command);
-
     bool cap_req(const std::vector<std::string>& capabilities);
 
     static std::string

@@ -16,28 +16,30 @@ using pplx::task_status::completed;
 string twitch_bot::get_user_name_from_user_notice_tags(const tags_t& tags) {
     auto display_name_it = tags.find("display-name");
     if (display_name_it != tags.cend() && display_name_it->second.has_value() &&
-        !display_name_it->second.value().empty())
+        !display_name_it->second.value().empty()) {
         return display_name_it->second.value();
-    else {
+    } else {
         auto login_it = tags.find("login");
-        if (login_it != tags.cend() && login_it->second.has_value() && !login_it->second.value().empty())
+        if (login_it != tags.cend() && login_it->second.has_value() && !login_it->second.value().empty()) {
             return login_it->second.value();
-        else
+        } else {
             assert(false);
+        }
     }
 }
 
 string twitch_bot::get_gifted_recipient_user_name(const tags_t& tags) {
     auto display_name_it = tags.find("msg-param-recipient-display-name");
     if (display_name_it != tags.end() && display_name_it->second.has_value() &&
-        !display_name_it->second.value().empty())
+        !display_name_it->second.value().empty()) {
         return display_name_it->second.value();
-    else {
+    } else {
         auto login_it = tags.find("msg-param-recipient-user-name");
-        if (login_it != tags.end() && login_it->second.has_value() && !login_it->second.value().empty())
+        if (login_it != tags.end() && login_it->second.has_value() && !login_it->second.value().empty()) {
             return login_it->second.value();
-        else
+        } else {
             assert(false);
+        }
     }
 }
 
@@ -46,9 +48,9 @@ string twitch_bot::get_user_name_private_message(const message& message) {
     auto tags = message.tags();
     auto display_name_it = tags.find("display-name");
     if (display_name_it != tags.end() && display_name_it->second.has_value() &&
-        !display_name_it->second.value().empty())
+        !display_name_it->second.value().empty()) {
         return display_name_it->second.value();
-    else {
+    } else {
         assert(message.prefix().has_value());
         return message.prefix().value().main();
     }
@@ -177,10 +179,6 @@ bool twitch_bot::join_channel(const string& channel) {
 
     m_joined_channels.insert(channel);
     return true;
-}
-
-void twitch_bot::on_command(const message& command) {
-
 }
 
 bool twitch_bot::cap_req(const vector<string>& capabilities) {

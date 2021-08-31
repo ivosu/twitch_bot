@@ -25,6 +25,7 @@ add_executable(
         src/utils/logging.hpp
         src/db/support/serialization/bson_handler_serializer.cpp
         src/db/support/configuration/mongodb_libconfig.cpp
+        src/handlers/cpp_event_handler.h
         src/handlers/python_event_handler.cpp
 )
 
