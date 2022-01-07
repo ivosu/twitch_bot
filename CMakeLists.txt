@@ -27,8 +27,7 @@ add_executable(
         src/db/support/configuration/mongodb_libconfig.cpp
         src/handlers/cpp_event_handler.h
         src/handlers/python_event_handler.cpp
-        src/interface/ncurses_console_interface.cpp
-        src/interface/ncurses_console_interface.h
+        src/interface/console_interface.h
 )
 
 include_directories(${LIBMONGOCXX_INCLUDE_DIRS})
